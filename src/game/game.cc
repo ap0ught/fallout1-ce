@@ -524,11 +524,13 @@ int game_handle_input(int eventCode, bool isInCombatMode)
         game_quit_with_confirm();
         break;
     case KEY_TAB:
+        // Repurposed: inventory (was automap, which moved to M). The Alt
+        // guard keeps Alt+Tab task switching from opening it.
         if (intface_is_enabled()
             && keys[SDL_SCANCODE_LALT] == 0
             && keys[SDL_SCANCODE_RALT] == 0) {
             gsound_play_sfx_file("ib1p1xx1");
-            automap(true, false);
+            handle_inventory();
         }
         break;
     case KEY_CTRL_P:
@@ -558,7 +560,12 @@ int game_handle_input(int eventCode, bool isInCombatMode)
         break;
     case KEY_UPPERCASE_M:
     case KEY_LOWERCASE_M:
-        gmouse_3d_toggle_mode();
+        // Repurposed: automap (was cursor-mode toggle, still on right-click).
+        // Tab, its vanilla key, now opens the inventory.
+        if (intface_is_enabled()) {
+            gsound_play_sfx_file("ib1p1xx1");
+            automap(true, false);
+        }
         break;
     case KEY_UPPERCASE_B:
     case KEY_LOWERCASE_B:

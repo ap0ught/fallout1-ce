@@ -284,6 +284,9 @@ void automap(bool isInGame, bool isUsingScanner)
         case KEY_ESCAPE:
         case KEY_UPPERCASE_A:
         case KEY_LOWERCASE_A:
+        // M toggles the automap closed now that it also opens it.
+        case KEY_UPPERCASE_M:
+        case KEY_LOWERCASE_M:
             done = true;
             break;
         case KEY_UPPERCASE_H:

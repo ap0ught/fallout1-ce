@@ -11,6 +11,8 @@ Yes this is vibe-coded. I know just enough python to be dangerous but anything d
 | `W` `A` `S` `D` | Walk continuously (exploration only; hold two keys, e.g. `W`+`D`, for the hex diagonals) |
 | `Shift` (held) | Invert your click-to-move run/walk preference |
 | `F` | Enter combat (moved from `A`, which now walks) |
+| `Tab` | Open inventory (was automap; `I` still works too) |
+| `M` | Toggle the automap (was the cursor-mode toggle, which stays on right-click) |
 
 Notes on the design:
 
