@@ -19,7 +19,6 @@
 #include "plib/gnw/input.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
-#include "plib/gnw/touch.h"
 
 namespace fallout {
 
@@ -191,11 +190,6 @@ int gmovie_play(int game_movie, int game_movie_flags)
     int buttons;
     do {
         if (!moviePlaying() || game_user_wants_to_quit || get_input() != -1) {
-            break;
-        }
-
-        Gesture gesture;
-        if (touch_get_gesture(&gesture) && gesture.state == kEnded) {
             break;
         }
 
