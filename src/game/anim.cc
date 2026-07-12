@@ -3131,6 +3131,28 @@ void dude_wasd_process()
     register_end();
 }
 
+// Keeps the view centered on the dude while he moves during exploration
+// (WASD or click-to-move alike). Called once per frame from
+// main_game_loop(). Only recenters when his tile actually changes, so
+// mouse-edge free look still works while standing still. Combat is left
+// alone - it centers on whoever's turn it is - and scripted sequences
+// (interface disabled) keep control of their own camera. Without the
+// ignore-restrictions flag, tile_set_center() refuses to scroll past map
+// bounds, so the camera parks at the edge just like manual scrolling.
+void dude_camera_follow()
+{
+    static int lastTile = -1;
+
+    if (!intface_is_enabled() || isInCombat()) {
+        return;
+    }
+
+    if (obj_dude->tile != lastTile) {
+        lastTile = obj_dude->tile;
+        tile_set_center(obj_dude->tile, TILE_SET_CENTER_REFRESH_WINDOW);
+    }
+}
+
 // 0x417AB0
 void dude_fidget()
 {

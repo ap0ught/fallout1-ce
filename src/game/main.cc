@@ -330,6 +330,9 @@ static void main_game_loop()
         // frame and steps the dude one tile at a time.
         dude_wasd_process();
 
+        // Follow-cam: keep the view on the dude while he moves.
+        dude_camera_follow();
+
         scripts_check_state();
 
         map_check_state();
