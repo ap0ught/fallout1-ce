@@ -1,4 +1,24 @@
-# Fallout Community Edition
+# Fallout Community Edition — WASD Movement Fork
+
+This is a fork of [alexbatalov/fallout1-ce](https://github.com/alexbatalov/fallout1-ce) that adds **WASD walking** to Fallout 1. Contributions and playtesting feedback are welcome — open an issue or PR against the `feature/wasd-movement` branch.
+
+## WASD controls
+
+| Key | Action |
+| --- | --- |
+| `W` `A` `S` `D` | Walk continuously (exploration only; hold two keys, e.g. `W`+`D`, for the hex diagonals) |
+| `Shift` (held) | Invert your click-to-move run/walk preference |
+| `F` | Enter combat (moved from `A`, which now walks) |
+
+Notes on the design:
+
+- Fallout's world is a hex grid with six movement directions, so 8-way WASD is mapped onto it: the four two-key diagonals map directly, and `W`/`S` alone alternate between the two upper/lower diagonals each step so travel reads as roughly straight up/down.
+- Movement is exploration-only — combat is completely untouched and keeps vanilla turn-based action-point movement.
+- `A` (was Enter Combat) and `S` (was Skilldex) are repurposed for walking. Enter Combat is now `F`; Skilldex remains available via its interface-bar button.
+
+The upstream project description follows.
+
+---
 
 Fallout Community Edition is a fully working re-implementation of Fallout, with the same original gameplay, engine bugfixes, and some quality of life improvements, that works (mostly) hassle-free on multiple platforms.
 
