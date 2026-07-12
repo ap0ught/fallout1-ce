@@ -2,6 +2,8 @@
 
 This is a fork of [alexbatalov/fallout1-ce](https://github.com/alexbatalov/fallout1-ce) that adds **WASD walking** to Fallout 1. Contributions and playtesting feedback are welcome — open an issue or PR against the `feature/wasd-movement` branch.
 
+Yes this is vibe-coded. I know just enough python to be dangerous but anything dealing with this game has been helped with using AI. I am just starting to learn C and would appreciate any help with this project. The goal is to modernize travel and eventually combat. 
+
 ## WASD controls
 
 | Key | Action |
