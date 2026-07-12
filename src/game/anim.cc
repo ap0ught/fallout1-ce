@@ -3050,6 +3050,87 @@ int dude_run(int action_points)
     return register_end();
 }
 
+// Maps the currently held WASD keys onto one of the six hex rotations.
+// Diagonals (e.g. W+D) select the corner directions; pressing W or S alone has
+// no pure hex equivalent, so we alternate the two upper/lower diagonals each
+// step to keep travel reading as roughly straight up/down on screen. Returns a
+// ROTATION_* value, or -1 when no movement key is held.
+static int dude_wasd_rotation()
+{
+    bool w = keys[SDL_SCANCODE_W] != 0;
+    bool a = keys[SDL_SCANCODE_A] != 0;
+    bool s = keys[SDL_SCANCODE_S] != 0;
+    bool d = keys[SDL_SCANCODE_D] != 0;
+
+    if (w && d) return ROTATION_NE;
+    if (w && a) return ROTATION_NW;
+    if (s && d) return ROTATION_SE;
+    if (s && a) return ROTATION_SW;
+    if (d) return ROTATION_E;
+    if (a) return ROTATION_W;
+
+    if (w || s) {
+        static bool flip = false;
+        flip = !flip;
+        if (w) return flip ? ROTATION_NE : ROTATION_NW;
+        return flip ? ROTATION_SE : ROTATION_SW;
+    }
+
+    return -1;
+}
+
+// Drives continuous WASD walking. Called once per frame from main_game_loop().
+// Steps the dude one tile in the direction selected by the held keys, chaining
+// the next step only once the current one finishes. Exploration only - it is a
+// no-op in combat, so turn-based action-point movement is unaffected.
+void dude_wasd_process()
+{
+    // Only when the normal interface is up and keyboard input is live.
+    if (!intface_is_enabled() || kb_is_disabled()) {
+        return;
+    }
+
+    // Leave turn-based combat movement exactly as vanilla.
+    if (isInCombat()) {
+        return;
+    }
+
+    // Wait for the in-progress step (if any) to complete before queuing
+    // another, so a held key walks one tile at a time rather than stacking up.
+    if (anim_busy(obj_dude)) {
+        return;
+    }
+
+    int rotation = dude_wasd_rotation();
+    if (rotation == -1) {
+        return;
+    }
+
+    int dest = tile_num_in_direction(obj_dude->tile, rotation, 1);
+    if (dest == obj_dude->tile) {
+        // Edge of the map - tile_num_in_direction clamps to the same tile.
+        return;
+    }
+
+    // Mirror the click-to-move running preference (Shift inverts it).
+    bool running;
+    configGetBool(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_RUNNING_KEY, &running);
+    if (keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT]) {
+        running = !running;
+    }
+
+    register_begin(ANIMATION_REQUEST_RESERVED);
+    if (running) {
+        if (!perk_level(PERK_SILENT_RUNNING)) {
+            pc_flag_off(PC_FLAG_SNEAKING);
+        }
+        register_object_run_to_tile(obj_dude, dest, obj_dude->elevation, -1, 0);
+    } else {
+        register_object_move_to_tile(obj_dude, dest, obj_dude->elevation, -1, 0);
+    }
+    register_end();
+}
+
 // 0x417AB0
 void dude_fidget()
 {
