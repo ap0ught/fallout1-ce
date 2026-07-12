@@ -431,7 +431,9 @@ void handle_inventory()
 
         int keyCode = get_input();
 
-        if (keyCode == KEY_ESCAPE || keyCode == KEY_UPPERCASE_I || keyCode == KEY_LOWERCASE_I) {
+        // Tab closes too, so the key that opens the inventory also toggles
+        // it shut (mirrors the automap's Tab/M behavior).
+        if (keyCode == KEY_ESCAPE || keyCode == KEY_UPPERCASE_I || keyCode == KEY_LOWERCASE_I || keyCode == KEY_TAB) {
             break;
         }
 

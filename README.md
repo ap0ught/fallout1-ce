@@ -11,12 +11,12 @@ Yes this is vibe-coded. I know just enough python to be dangerous but anything d
 | `W` `A` `S` `D` | Walk continuously (exploration only; hold two keys, e.g. `W`+`D`, for the hex diagonals) |
 | `Shift` (held) | Invert your click-to-move run/walk preference |
 | `F` | Enter combat (moved from `A`, which now walks) |
-| `Tab` | Open inventory (was automap; `I` still works too) |
+| `Tab` | Toggle the inventory open/closed (was automap; `I` still works too) |
 | `M` | Toggle the automap (was the cursor-mode toggle, which stays on right-click) |
 
 Notes on the design:
 
-- **Follow-cam:** during exploration the view stays centered on your character while he moves (WASD or click-to-move). Stand still and mouse-edge scrolling free-looks as usual; the camera stops at map bounds; combat and scripted scenes keep their own vanilla camera.
+- **Follow-cam:** during exploration the view stays centered on your character while he moves (WASD or click-to-move), gliding smoothly at pixel granularity rather than snapping tile by tile. Stand still and mouse-edge scrolling free-looks as usual; the camera stops at map bounds; combat and scripted scenes keep their own vanilla camera.
 - Fallout's world is a hex grid with six movement directions, so 8-way WASD is mapped onto it: the four two-key diagonals map directly, and `W`/`S` alone alternate between the two upper/lower diagonals each step so travel reads as roughly straight up/down.
 - Movement is exploration-only — combat is completely untouched and keeps vanilla turn-based action-point movement.
 - `A` (was Enter Combat) and `S` (was Skilldex) are repurposed for walking. Enter Combat is now `F`; Skilldex remains available via its interface-bar button.

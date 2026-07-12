@@ -3139,17 +3139,79 @@ void dude_wasd_process()
 // (interface disabled) keep control of their own camera. Without the
 // ignore-restrictions flag, tile_set_center() refuses to scroll past map
 // bounds, so the camera parks at the edge just like manual scrolling.
+//
+// To read as smooth rather than one-tile snaps, each recenter is hidden
+// behind a pixel "lag": the moment the view jumps to the new center, the
+// same jump is applied back as a tile_pixel_shift(), so nothing visibly
+// moves - then the lag decays a fraction per frame and the world glides
+// under the dude. A step arriving mid-glide folds the leftover into the
+// new lag, so running never causes the camera to fall behind by more
+// than a couple of tiles.
 void dude_camera_follow()
 {
+    // Pixel offset still to be worked off (the glide), and the portion of
+    // it currently baked into the tile renderer's offsets.
+    static int lagX = 0;
+    static int lagY = 0;
+    static int appliedX = 0;
+    static int appliedY = 0;
     static int lastTile = -1;
 
     if (!intface_is_enabled() || isInCombat()) {
+        // Someone else (combat, dialog, map load) owns the camera and will
+        // recanonicalize the offsets, so drop any glide in progress rather
+        // than resume a stale pan when control returns.
+        lagX = lagY = 0;
+        appliedX = appliedY = 0;
+        lastTile = obj_dude->tile;
         return;
     }
 
     if (obj_dude->tile != lastTile) {
         lastTile = obj_dude->tile;
-        tile_set_center(obj_dude->tile, TILE_SET_CENTER_REFRESH_WINDOW);
+
+        int beforeX;
+        int beforeY;
+        tile_coord(obj_dude->tile, &beforeX, &beforeY, map_elevation);
+
+        // Recenter instantly; on success the offsets are canonical again
+        // (our applied shift is wiped), and the on-screen jump the player
+        // would have seen becomes the new lag to glide away. On failure
+        // (map border) the camera stays parked and any glide continues.
+        if (tile_set_center(obj_dude->tile, 0) == 0) {
+            int afterX;
+            int afterY;
+            tile_coord(obj_dude->tile, &afterX, &afterY, map_elevation);
+
+            lagX = beforeX - afterX;
+            lagY = beforeY - afterY;
+            appliedX = 0;
+            appliedY = 0;
+        }
+    }
+
+    if (lagX == 0 && lagY == 0 && appliedX == 0 && appliedY == 0) {
+        return;
+    }
+
+    // Work off roughly a sixth of the remaining lag per frame, always at
+    // least one pixel so the glide actually terminates.
+    if (lagX != 0) {
+        int stepX = lagX / 6;
+        if (stepX == 0) stepX = (lagX > 0) ? 1 : -1;
+        lagX -= stepX;
+    }
+    if (lagY != 0) {
+        int stepY = lagY / 6;
+        if (stepY == 0) stepY = (lagY > 0) ? 1 : -1;
+        lagY -= stepY;
+    }
+
+    if (lagX != appliedX || lagY != appliedY) {
+        tile_pixel_shift(lagX - appliedX, lagY - appliedY);
+        appliedX = lagX;
+        appliedY = lagY;
+        tile_refresh_display();
     }
 }
 
