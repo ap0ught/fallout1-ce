@@ -9,6 +9,7 @@
 #include "game/art.h"
 #include "game/combat.h"
 #include "game/critter.h"
+#include "game/enhance.h"
 #include "game/game.h"
 #include "game/gconfig.h"
 #include "game/gmouse.h"
@@ -785,7 +786,6 @@ void obj_render_pre_roof(Rect* rect, int elevation)
         return;
     }
 
-    int ambientIntensity = light_get_ambient();
     int minX = updatedRect.ulx - 320;
     int minY = updatedRect.uly - 240;
     int maxX = updatedRect.lrx + 320;
@@ -811,7 +811,7 @@ void obj_render_pre_roof(Rect* rect, int elevation)
 
             int lightIntensity;
             if (objectListNode != NULL) {
-                lightIntensity = std::max(ambientIntensity, light_get_tile(elevation, objectListNode->obj->tile));
+                lightIntensity = enhance_render_light(elevation, objectListNode->obj->tile);
             }
 
             while (objectListNode != NULL) {
@@ -849,7 +849,7 @@ void obj_render_pre_roof(Rect* rect, int elevation)
 
         ObjectListNode* objectListNode = renderTable[i];
         if (objectListNode != NULL) {
-            lightIntensity = std::max(ambientIntensity, light_get_tile(elevation, objectListNode->obj->tile));
+            lightIntensity = enhance_render_light(elevation, objectListNode->obj->tile);
         }
 
         while (objectListNode != NULL) {
@@ -2259,6 +2259,14 @@ void obj_bound(Object* obj, Rect* rect)
     }
 
     art_ptr_unlock(artHandle);
+
+    // CE: the projected shadow reaches sideways beyond the sprite; widen the
+    // invalidation rect so moving critters don't leave shadow trails.
+    if (enhance_shadows_enabled() && obj->tile != -1 && FID_TYPE(obj->fid) == OBJ_TYPE_CRITTER) {
+        int margin = height / 6 + 2;
+        rect->ulx -= margin;
+        rect->lrx += margin;
+    }
 
     if (isOutlined) {
         rect->ulx--;
@@ -4664,6 +4672,21 @@ static void obj_render_object(Object* object, Rect* rect, int light)
 
         object->sx = objectRect.ulx;
         object->sy = objectRect.uly;
+    }
+
+    // CE: projected ground shadow for living critters. Drawn before the
+    // sprite (and before the clip check - the shadow reaches outside the
+    // sprite rect and clips itself against the update rect).
+    if (type == OBJ_TYPE_CRITTER
+        && object->tile != -1
+        && enhance_shadows_enabled()
+        && (object->flags & OBJECT_FLAG_0xFC000) == 0
+        && !critter_is_dead(object)
+        && !critter_is_prone(object)) {
+        unsigned char* frameData = art_frame_data(art, object->frame, object->rotation);
+        if (frameData != NULL) {
+            enhance_render_shadow(frameData, frameWidth, frameHeight, object->sx, object->sy, rect, back_buf, buf_full, light);
+        }
     }
 
     if (rect_inside_bound(&objectRect, rect, &objectRect) != 0) {

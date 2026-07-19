@@ -11,6 +11,7 @@
 #include "game/critter.h"
 #include "game/cycle.h"
 #include "game/editor.h"
+#include "game/enhance.h"
 #include "game/game.h"
 #include "game/gconfig.h"
 #include "game/gmouse.h"
@@ -320,6 +321,9 @@ int iso_init()
     cycle_init();
     debug_printf(">cycle_init\t\t");
 
+    enhance_init();
+    debug_printf(">enhance_init\t");
+
     tile_enable_scroll_blocking();
     tile_enable_scroll_limiting();
 
@@ -348,6 +352,7 @@ void iso_reset()
     tile_reset();
     obj_reset();
     cycle_reset();
+    enhance_reset();
     intface_reset();
 }
 
@@ -355,6 +360,7 @@ void iso_reset()
 void iso_exit()
 {
     intface_exit();
+    enhance_exit();
     cycle_exit();
     obj_exit();
     tile_exit();

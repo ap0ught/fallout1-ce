@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include "game/config.h"
+#include "game/enhance.h"
 #include "game/gconfig.h"
 #include "game/gmouse.h"
 #include "game/light.h"
@@ -612,6 +613,7 @@ static void refresh_game(Rect* rect, int elevation)
     square_render_roof(&rectToUpdate, elevation);
     bounds_render(&rectToUpdate, elevation);
     obj_render_post_roof(&rectToUpdate, elevation);
+    enhance_scene_post_process(buf, buf_full, &rectToUpdate, buf_width, buf_length);
     blit(&rectToUpdate);
 }
 
@@ -1187,7 +1189,7 @@ void square_render_roof(Rect* rect, int elevation)
         minY = square_length - 1;
     }
 
-    int light = light_get_ambient();
+    int light = enhance_render_ambient();
 
     int baseSquareTile = square_width * minY;
 
@@ -1666,15 +1668,9 @@ void floor_draw(int fid, int x, int y, Rect* rect)
     tile = tile_num(savedX, savedY + 13, map_elevation);
     if (tile != -1) {
         int parity = tile & 1;
-        int ambientIntensity = light_get_ambient();
         for (int i = 0; i < 10; i++) {
-            // NOTE: calling light_get_tile two times, probably a result of using __min kind macro
-            int tileIntensity = light_get_tile(elev, tile + verticies[i].offsets[parity]);
-            if (tileIntensity <= ambientIntensity) {
-                tileIntensity = ambientIntensity;
-            }
-
-            verticies[i].intensity = tileIntensity;
+            // CE: render-side light (max with ambient, flicker, weather dim).
+            verticies[i].intensity = enhance_render_light(elev, tile + verticies[i].offsets[parity]);
         }
 
         int v23 = 0;
