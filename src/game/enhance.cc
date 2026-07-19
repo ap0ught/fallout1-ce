@@ -4,10 +4,14 @@
 #include <math.h>
 #include <string.h>
 
+#include <algorithm>
+
+#include "game/art.h"
 #include "game/config.h"
 #include "game/gconfig.h"
 #include "game/light.h"
 #include "game/map.h"
+#include "game/object.h"
 #include "game/scripts.h"
 #include "game/tile.h"
 #include "game/weather.h"
@@ -19,6 +23,12 @@ namespace fallout {
 
 #define FLICKER_BUCKET_COUNT 64
 
+// Tint buckets for colored light: 0-1 cool, 2 neutral, 3-4 warm.
+#define TINT_BUCKET_COUNT 5
+#define TINT_BUCKET_NEUTRAL 2
+
+#define WARMTH_CACHE_SIZE 32
+
 // Max extra darkening applied by the vignette at the far corners, in
 // intensity table steps (128 = neutral).
 #define VIGNETTE_MAX_DARKEN 26
@@ -28,12 +38,17 @@ static bool enhance_game_active();
 static void enhance_update_tint();
 static void enhance_update_flicker(unsigned int now);
 static void enhance_time_of_day_tint(int* r, int* g, int* b);
+static int enhance_classify_warmth(Object* obj);
+static void enhance_build_tint_tables();
+static void enhance_rebuild_ao();
 
 static bool enhance_initialized = false;
 static bool tod_tint_enabled = true;
 static bool flicker_enabled = true;
 static bool shadows_enabled = true;
 static bool vignette_enabled = true;
+static bool colored_lights_enabled = true;
+static bool wall_ao_enabled = true;
 
 static unsigned int last_bk_time;
 static unsigned int last_refresh_time;
@@ -48,6 +63,28 @@ static int shadow_shear = 64;
 static unsigned char* vignette_map = NULL;
 static int vignette_width = 0;
 static int vignette_height = 0;
+
+// Warmth of the light source currently being distributed by
+// `obj_adjust_light` (-256 cool .. 256 warm, 0 neutral).
+static int light_source_warmth = 0;
+
+// Per-tile accumulated warmth-weighted source light (intensity * warmth >> 8,
+// mirroring every light_add_to_tile/light_subtract_from_tile call).
+static int warm_accum[ELEVATION_COUNT][HEX_GRID_SIZE];
+
+static struct {
+    int fid;
+    int warmth;
+} warmth_cache[WARMTH_CACHE_SIZE];
+static int warmth_cache_count = 0;
+static int warmth_cache_cursor = 0;
+
+static unsigned char tinted_intensity_table[TINT_BUCKET_COUNT][256][256];
+static bool tinted_tables_built = false;
+
+// Wall-contact ambient occlusion, 0..255 fraction of light removed.
+static unsigned char ao_map[ELEVATION_COUNT][HEX_GRID_SIZE];
+static char ao_built_for[16];
 
 int enhance_init()
 {
@@ -73,6 +110,22 @@ int enhance_init()
         vignette_enabled = value != 0;
     }
 
+    colored_lights_enabled = true;
+    if (config_get_value(&game_config, "enhancements", "colored_lights", &value)) {
+        colored_lights_enabled = value != 0;
+    }
+
+    wall_ao_enabled = true;
+    if (config_get_value(&game_config, "enhancements", "wall_ao", &value)) {
+        wall_ao_enabled = value != 0;
+    }
+
+    enhance_light_color_reset();
+    memset(ao_map, 0, sizeof(ao_map));
+    ao_built_for[0] = '\0';
+    warmth_cache_count = 0;
+    warmth_cache_cursor = 0;
+
     weather_init();
 
     last_bk_time = get_time();
@@ -89,7 +142,15 @@ int enhance_init()
 void enhance_reset()
 {
     weather_reset();
+    memset(ao_map, 0, sizeof(ao_map));
+    ao_built_for[0] = '\0';
     enhance_update_tint();
+}
+
+void enhance_map_changed()
+{
+    memset(ao_map, 0, sizeof(ao_map));
+    ao_built_for[0] = '\0';
 }
 
 void enhance_exit()
@@ -136,6 +197,16 @@ int enhance_render_light(int elevation, int tile)
         intensity = intensity * dim >> 8;
         if (intensity < LIGHT_LEVEL_MIN) {
             intensity = LIGHT_LEVEL_MIN;
+        }
+    }
+
+    if (wall_ao_enabled && elevationIsValid(elevation) && hexGridTileIsValid(tile)) {
+        int ao = ao_map[elevation][tile];
+        if (ao != 0) {
+            intensity -= intensity * ao >> 8;
+            if (intensity < LIGHT_LEVEL_MIN) {
+                intensity = LIGHT_LEVEL_MIN;
+            }
         }
     }
 
@@ -267,6 +338,218 @@ void enhance_scene_post_process(unsigned char* buf, int pitch, Rect* rect, int b
     }
 }
 
+void enhance_light_source_begin(Object* obj)
+{
+    light_source_warmth = colored_lights_enabled ? enhance_classify_warmth(obj) : 0;
+}
+
+void enhance_light_source_end()
+{
+    light_source_warmth = 0;
+}
+
+void enhance_light_color_add(int elevation, int tile, int intensity)
+{
+    if (light_source_warmth != 0) {
+        warm_accum[elevation][tile] += intensity * light_source_warmth >> 8;
+    }
+}
+
+void enhance_light_color_subtract(int elevation, int tile, int intensity)
+{
+    if (light_source_warmth != 0) {
+        warm_accum[elevation][tile] -= intensity * light_source_warmth >> 8;
+    }
+}
+
+void enhance_light_color_reset()
+{
+    memset(warm_accum, 0, sizeof(warm_accum));
+}
+
+unsigned char (*enhance_light_table(int elevation, int tile))[256]
+{
+    if (!colored_lights_enabled || !elevationIsValid(elevation) || !hexGridTileIsValid(tile)) {
+        return intensityColorTable;
+    }
+
+    // Source-contributed light on this tile (655 is the empty-tile base).
+    int sourceLight = light_get_tile_true(elevation, tile) - 655;
+    if (sourceLight < 1024) {
+        return intensityColorTable;
+    }
+
+    int accum = warm_accum[elevation][tile];
+    if (accum > -16 && accum < 16) {
+        return intensityColorTable;
+    }
+
+    if (!tinted_tables_built) {
+        enhance_build_tint_tables();
+    }
+
+    // Average warmth of the source light, then weighted by how much of the
+    // visible light actually comes from sources rather than ambient.
+    int warmth = accum * 256 / sourceLight;
+    warmth = std::clamp(warmth, -256, 256);
+
+    int ambient = light_get_ambient();
+    int total = std::min(std::max(ambient, 655 + sourceLight), LIGHT_LEVEL_MAX);
+    int excess = total - ambient;
+    if (excess <= 0) {
+        return intensityColorTable;
+    }
+    warmth = warmth * excess / total;
+
+    int bucket;
+    if (warmth >= 0) {
+        bucket = TINT_BUCKET_NEUTRAL + (warmth + 48) / 96;
+    } else {
+        bucket = TINT_BUCKET_NEUTRAL - (48 - warmth) / 96;
+    }
+    bucket = std::clamp(bucket, 0, TINT_BUCKET_COUNT - 1);
+
+    return tinted_intensity_table[bucket];
+}
+
+// Estimates whether a light source is warm (fires, braziers) or cool
+// (monitors, force fields) from the average palette color of its art.
+// Critters and items are considered neutral emitters.
+static int enhance_classify_warmth(Object* obj)
+{
+    int type = FID_TYPE(obj->fid);
+    if (type != OBJ_TYPE_SCENERY && type != OBJ_TYPE_MISC) {
+        return 0;
+    }
+
+    for (int index = 0; index < warmth_cache_count; index++) {
+        if (warmth_cache[index].fid == obj->fid) {
+            return warmth_cache[index].warmth;
+        }
+    }
+
+    int warmth = 0;
+
+    CacheEntry* handle;
+    Art* art = art_ptr_lock(obj->fid, &handle);
+    if (art != NULL) {
+        unsigned char* data = art_frame_data(art, 0, 0);
+        if (data != NULL) {
+            int size = art_frame_width(art, 0, 0) * art_frame_length(art, 0, 0);
+            int sumR = 0;
+            int sumG = 0;
+            int sumB = 0;
+            for (int offset = 0; offset < size; offset += 3) {
+                unsigned char c = data[offset];
+                if (c == 0) {
+                    continue;
+                }
+                sumR += cmap[3 * c];
+                sumG += cmap[3 * c + 1];
+                sumB += cmap[3 * c + 2];
+            }
+
+            int total = sumR + sumG + sumB;
+            if (total > 0) {
+                warmth = std::clamp((sumR - sumB) * 340 / total, -256, 256);
+                if (warmth > -40 && warmth < 40) {
+                    warmth = 0;
+                }
+            }
+        }
+        art_ptr_unlock(handle);
+    }
+
+    if (warmth_cache_count < WARMTH_CACHE_SIZE) {
+        warmth_cache[warmth_cache_count].fid = obj->fid;
+        warmth_cache[warmth_cache_count].warmth = warmth;
+        warmth_cache_count++;
+    } else {
+        warmth_cache[warmth_cache_cursor].fid = obj->fid;
+        warmth_cache[warmth_cache_cursor].warmth = warmth;
+        warmth_cache_cursor = (warmth_cache_cursor + 1) % WARMTH_CACHE_SIZE;
+    }
+
+    return warmth;
+}
+
+// Builds warm/cool variants of `intensityColorTable`. Index 0 (transparent)
+// and 0xE5+ (color cycling and glow specials) keep the neutral behavior so
+// palette animation is never frozen by a tint.
+static void enhance_build_tint_tables()
+{
+    for (int bucket = 0; bucket < TINT_BUCKET_COUNT; bucket++) {
+        int s = bucket - TINT_BUCKET_NEUTRAL;
+
+        int scaleR;
+        int scaleG;
+        int scaleB;
+        if (s >= 0) {
+            scaleR = 256 + 20 * s;
+            scaleG = 256 + 2 * s;
+            scaleB = 256 - 26 * s;
+        } else {
+            scaleR = 256 + 22 * s;
+            scaleG = 256 + 5 * s;
+            scaleB = 256 - 18 * s;
+        }
+
+        for (int color = 0; color < 256; color++) {
+            memcpy(tinted_intensity_table[bucket][color], intensityColorTable[color], 256);
+
+            if (s == 0 || color == 0 || color >= 0xE5) {
+                continue;
+            }
+
+            int rgb = Color2RGB(color);
+            int r = (rgb & 0x7C00) >> 10;
+            int g = (rgb & 0x3E0) >> 5;
+            int b = rgb & 0x1F;
+
+            for (int level = 0; level <= 128; level++) {
+                int rr = std::min(r * level / 128 * scaleR >> 8, 31);
+                int gg = std::min(g * level / 128 * scaleG >> 8, 31);
+                int bb = std::min(b * level / 128 * scaleB >> 8, 31);
+                tinted_intensity_table[bucket][color][level] = colorTable[(rr << 10) | (gg << 5) | bb];
+            }
+        }
+    }
+
+    tinted_tables_built = true;
+}
+
+// Marks wall tiles and their neighbors for soft base darkening. The Gouraud
+// floor lighting interpolates these per-tile values into smooth gradients.
+static void enhance_rebuild_ao()
+{
+    memset(ao_map, 0, sizeof(ao_map));
+
+    Object* obj = obj_find_first();
+    while (obj != NULL) {
+        if (FID_TYPE(obj->fid) == OBJ_TYPE_WALL
+            && elevationIsValid(obj->elevation)
+            && hexGridTileIsValid(obj->tile)) {
+            unsigned char* ao = ao_map[obj->elevation];
+
+            int self = ao[obj->tile] + 34;
+            ao[obj->tile] = self > 72 ? 72 : self;
+
+            for (int rotation = 0; rotation < ROTATION_COUNT; rotation++) {
+                int neighbor = tile_num_in_direction(obj->tile, rotation, 1);
+                if (hexGridTileIsValid(neighbor)) {
+                    int value = ao[neighbor] + 22;
+                    ao[neighbor] = value > 56 ? 56 : value;
+                }
+            }
+        }
+
+        obj = obj_find_next();
+    }
+
+    strncpy(ao_built_for, map_data.name, sizeof(ao_built_for) - 1);
+    ao_built_for[sizeof(ao_built_for) - 1] = '\0';
+}
+
 // Mood systems only act while a map is loaded - the main menu, credits and
 // movies keep a neutral palette.
 static bool enhance_game_active()
@@ -285,6 +568,10 @@ static void enhance_bk()
     if (!enhance_game_active()) {
         colorSetDisplayTint(256, 256, 256);
         return;
+    }
+
+    if (wall_ao_enabled && strncmp(ao_built_for, map_data.name, sizeof(ao_built_for)) != 0) {
+        enhance_rebuild_ao();
     }
 
     weather_update();

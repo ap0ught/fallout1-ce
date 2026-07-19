@@ -1673,6 +1673,9 @@ void floor_draw(int fid, int x, int y, Rect* rect)
             verticies[i].intensity = enhance_render_light(elev, tile + verticies[i].offsets[parity]);
         }
 
+        // CE: warm/cool tinted intensity table for colored light sources.
+        unsigned char(*lightTable)[256] = enhance_light_table(elev, tile);
+
         int v23 = 0;
         for (int i = 0; i < 9; i++) {
             if (verticies[i + 1].intensity != verticies[i].intensity) {
@@ -1684,7 +1687,7 @@ void floor_draw(int fid, int x, int y, Rect* rect)
 
         if (v23 == 9) {
             unsigned char* frame_data = art_frame_data(art, 0, 0);
-            dark_trans_buf_to_buf(frame_data + frameWidth * v78 + v79, v77, v76, frameWidth, buf, x, y, buf_full, verticies[0].intensity);
+            dark_trans_buf_to_buf_lut(frame_data + frameWidth * v78 + v79, v77, v76, frameWidth, buf, x, y, buf_full, verticies[0].intensity, lightTable);
             goto out;
         }
 
@@ -1806,7 +1809,7 @@ void floor_draw(int fid, int x, int y, Rect* rect)
         while (--v76 != -1) {
             for (int kk = 0; kk < v77; kk++) {
                 if (*v67 != 0) {
-                    *v66 = intensityColorTable[*v67][*v68 >> 9];
+                    *v66 = lightTable[*v67][*v68 >> 9];
                 }
                 v67++;
                 v68++;

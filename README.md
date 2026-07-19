@@ -104,7 +104,7 @@ In time this stuff will receive in-game interface, right now you have to do it m
 
 ### Visual enhancements
 
-Fallout Community Edition includes a set of optional, palette-safe visual enhancements: time-of-day mood tinting (cool nights, warm dawns and dusks), subtle flicker on light sources (fires, lamps), projected ground shadows under critters that follow the sun, procedural weather (overcast skies, rain, thunderstorms with lightning, optional snow), and a soft vignette on the game view. Everything is rendered through the original 256-color lookup tables and prerendered sprites, so the classic look is preserved, and none of it affects gameplay (combat lighting checks are untouched).
+Fallout Community Edition includes a set of optional, palette-safe visual enhancements: time-of-day mood tinting (cool nights, warm dawns and dusks), subtle flicker on light sources (fires, lamps), colored light (fires cast warm light, monitors and force fields cast cool light — derived automatically from each source's art), projected ground shadows under critters that follow the sun, soft contact shadows at wall bases, procedural weather (overcast skies, rain with wet-ground glow reflections, thunderstorms with lightning, optional snow), drifting dust motes and midday heat shimmer on clear days, and a soft vignette on the game view. Everything is rendered through the original 256-color lookup tables and prerendered sprites, so the classic look is preserved, and none of it affects gameplay (combat lighting checks are untouched).
 
 All features are enabled by default and can be toggled individually in the `[enhancements]` section of `fallout.cfg`:
 
@@ -112,11 +112,18 @@ All features are enabled by default and can be toggled individually in the `[enh
 [enhancements]
 time_of_day_tint=1
 light_flicker=1
+colored_lights=1
 shadows=1
+wall_ao=1
 weather=1
 weather_snow=0
+wet_reflections=1
+ambient_dust=1
+heat_shimmer=1
 vignette=1
 ```
+
+Note that `wet_reflections`, `ambient_dust` and `heat_shimmer` are part of the weather system and are disabled when `weather=0`.
 
 Weather appears only outdoors — on ground level while the player is not under a roof. Some interior maps without roof tiles (vaults, caves) may be misdetected as outdoor; use `weather_indoor_maps` to exclude them, or `weather_outdoor_maps` to force weather on, with comma-separated map name fragments, e.g. `weather_indoor_maps=vault13,lavault`.
 

@@ -1,5 +1,6 @@
 #include "game/light.h"
 
+#include "game/enhance.h"
 #include "game/map_defs.h"
 #include "game/object.h"
 #include "game/perk.h"
@@ -137,6 +138,9 @@ void light_add_to_tile(int elevation, int tile, int lightIntensity)
     }
 
     tile_intensity[elevation][tile] += lightIntensity;
+
+    // CE: mirror the contribution into the render-side light color tracker.
+    enhance_light_color_add(elevation, tile, lightIntensity);
 }
 
 // 0x46CBB0
@@ -151,6 +155,9 @@ void light_subtract_from_tile(int elevation, int tile, int lightIntensity)
     }
 
     tile_intensity[elevation][tile] -= lightIntensity;
+
+    // CE: mirror the contribution into the render-side light color tracker.
+    enhance_light_color_subtract(elevation, tile, lightIntensity);
 }
 
 // 0x46CBEC
@@ -164,6 +171,9 @@ void light_reset_tiles()
             tile_intensity[elevation][tile] = 655;
         }
     }
+
+    // CE: keep the render-side light color tracker in sync.
+    enhance_light_color_reset();
 }
 
 } // namespace fallout

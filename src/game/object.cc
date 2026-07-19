@@ -2546,6 +2546,37 @@ void dark_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int 
     }
 }
 
+// CE: `dark_trans_buf_to_buf` with a selectable intensity lookup table so
+// tiles lit by colored sources can use warm/cool tinted variants.
+void dark_trans_buf_to_buf_lut(unsigned char* src, int srcWidth, int srcHeight, int srcPitch, unsigned char* dest, int destX, int destY, int destPitch, int light, unsigned char (*lut)[256])
+{
+    unsigned char* sp = src;
+    unsigned char* dp = dest + destPitch * destY + destX;
+
+    int srcStep = srcPitch - srcWidth;
+    int destStep = destPitch - srcWidth;
+    int lightModifier = light >> 9;
+
+    for (int y = 0; y < srcHeight; y++) {
+        for (int x = 0; x < srcWidth; x++) {
+            unsigned char b = *sp;
+            if (b != 0) {
+                if (b < 0xE5) {
+                    b = lut[b][lightModifier];
+                }
+
+                *dp = b;
+            }
+
+            sp++;
+            dp++;
+        }
+
+        sp += srcStep;
+        dp += destStep;
+    }
+}
+
 // 0x47D7E4
 void dark_translucent_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int srcPitch, unsigned char* dest, int destX, int destY, int destPitch, int light, unsigned char* a10, unsigned char* a11)
 {
@@ -3742,6 +3773,10 @@ static int obj_adjust_light(Object* obj, int a2, Rect* rect)
         return -1;
     }
 
+    // CE: classify this source's light color for the render-side tracker;
+    // every add/subtract below is mirrored there with this warmth.
+    enhance_light_source_begin(obj);
+
     AdjustLightIntensityProc* adjustLightIntensity = a2 ? light_subtract_from_tile : light_add_to_tile;
     adjustLightIntensity(obj->elevation, obj->tile, obj->lightIntensity);
 
@@ -4382,6 +4417,8 @@ static int obj_adjust_light(Object* obj, int a2, Rect* rect)
         rect_min_bound(rect, &objectRect, rect);
     }
 
+    enhance_light_source_end();
+
     return 0;
 }
 
@@ -4806,7 +4843,7 @@ static void obj_render_object(Object* object, Rect* rect, int light)
                         Rect* v21 = &(rects[i]);
                         if (v21->ulx <= v21->lrx && v21->uly <= v21->lry) {
                             unsigned char* sp = src + frameWidth * (v21->uly - objectRect.uly) + (v21->ulx - objectRect.ulx);
-                            dark_trans_buf_to_buf(sp, v21->lrx - v21->ulx + 1, v21->lry - v21->uly + 1, frameWidth, back_buf, v21->ulx, v21->uly, buf_full, light);
+                            dark_trans_buf_to_buf_lut(sp, v21->lrx - v21->ulx + 1, v21->lry - v21->uly + 1, frameWidth, back_buf, v21->ulx, v21->uly, buf_full, light, enhance_light_table(object->elevation, object->tile));
                         }
                     }
 
@@ -4848,7 +4885,7 @@ static void obj_render_object(Object* object, Rect* rect, int light)
         dark_translucent_trans_buf_to_buf(src, objectWidth, objectHeight, frameWidth, back_buf, objectRect.ulx, objectRect.uly, buf_full, light, energyBlendTable, commonGrayTable);
         break;
     default:
-        dark_trans_buf_to_buf(src, objectWidth, objectHeight, frameWidth, back_buf, objectRect.ulx, objectRect.uly, buf_full, light);
+        dark_trans_buf_to_buf_lut(src, objectWidth, objectHeight, frameWidth, back_buf, objectRect.ulx, objectRect.uly, buf_full, light, enhance_light_table(object->elevation, object->tile));
         break;
     }
 

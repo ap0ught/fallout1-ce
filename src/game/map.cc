@@ -1083,6 +1083,9 @@ int map_load_file(DB_FILE* stream)
     gmouse_enable_scrolling();
     gmouse_set_cursor(MOUSE_CURSOR_NONE);
 
+    // CE: object table is complete now - refresh derived render data.
+    enhance_map_changed();
+
     return rc;
 }
 

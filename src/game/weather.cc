@@ -25,6 +25,8 @@ namespace fallout {
 
 #define WEATHER_FLASH_DURATION 260
 
+#define WEATHER_DUST_PARTICLES 56
+
 typedef struct WeatherParticle {
     // 16.16 fixed point window coordinates.
     int x;
@@ -58,6 +60,9 @@ static const WeatherStateProfile weather_profiles[] = {
 
 static bool weather_enabled = false;
 static bool weather_snow_enabled = false;
+static bool weather_reflections_enabled = true;
+static bool weather_dust_enabled = true;
+static bool weather_shimmer_enabled = true;
 static char weather_outdoor_maps[256];
 static char weather_indoor_maps[256];
 
@@ -77,6 +82,14 @@ static int weather_particle_count = 0;
 static int weather_area_width = 640;
 static int weather_area_height = 380;
 
+// Ambient dust motes drifting on clear days.
+static WeatherParticle dust_particles[WEATHER_DUST_PARTICLES];
+static bool dust_active = false;
+static bool dust_spawned = false;
+
+// Heat shimmer around midday on clear days.
+static bool shimmer_active = false;
+
 // 0 = uninitialized so first update spawns from scratch.
 static bool weather_initialized = false;
 
@@ -92,6 +105,21 @@ int weather_init()
     weather_snow_enabled = false;
     if (config_get_value(&game_config, "enhancements", "weather_snow", &value)) {
         weather_snow_enabled = value != 0;
+    }
+
+    weather_reflections_enabled = true;
+    if (config_get_value(&game_config, "enhancements", "wet_reflections", &value)) {
+        weather_reflections_enabled = value != 0;
+    }
+
+    weather_dust_enabled = true;
+    if (config_get_value(&game_config, "enhancements", "ambient_dust", &value)) {
+        weather_dust_enabled = value != 0;
+    }
+
+    weather_shimmer_enabled = true;
+    if (config_get_value(&game_config, "enhancements", "heat_shimmer", &value)) {
+        weather_shimmer_enabled = value != 0;
     }
 
     weather_outdoor_maps[0] = '\0';
@@ -121,6 +149,9 @@ void weather_reset()
     weather_last_outdoor_check = 0;
     weather_flash_active = false;
     weather_particle_count = 0;
+    dust_active = false;
+    dust_spawned = false;
+    shimmer_active = false;
 }
 
 void weather_exit()
@@ -199,6 +230,50 @@ void weather_update()
         weather_particle_count = particleTarget;
     }
 
+    // Ambient dust motes on clear days; heat shimmer around midday.
+    bool precipitation = weather_state == WEATHER_STATE_RAIN
+        || weather_state == WEATHER_STATE_STORM
+        || weather_state == WEATHER_STATE_SNOW;
+    dust_active = weather_dust_enabled && weather_outdoor && (!precipitation || weather_intensity < 60);
+
+    int hour = game_time_hour();
+    shimmer_active = weather_shimmer_enabled && weather_outdoor && !precipitation
+        && weather_intensity < 40 && hour >= 1030 && hour <= 1530;
+
+    if (dust_active) {
+        if (!dust_spawned) {
+            for (int index = 0; index < WEATHER_DUST_PARTICLES; index++) {
+                WeatherParticle* particle = &(dust_particles[index]);
+                particle->x = weather_roll(weather_area_width) << 16;
+                particle->y = weather_roll(weather_area_height) << 16;
+                particle->vx = (weather_roll(40) - 20) << 16;
+                particle->vy = (weather_roll(14) - 7) << 16;
+            }
+            dust_spawned = true;
+        }
+
+        for (int index = 0; index < WEATHER_DUST_PARTICLES; index++) {
+            WeatherParticle* particle = &(dust_particles[index]);
+            particle->x += (int)((long long)(particle->vx + (weather_wind << 13)) * dt / 1000);
+            particle->y += (int)((long long)particle->vy * dt / 1000);
+
+            int x = particle->x >> 16;
+            int y = particle->y >> 16;
+            if (x < -8) {
+                particle->x = (weather_area_width + 8) << 16;
+            } else if (x > weather_area_width + 8) {
+                particle->x = -(8 << 16);
+            }
+            if (y < -8) {
+                particle->y = (weather_area_height + 8) << 16;
+            } else if (y > weather_area_height + 8) {
+                particle->y = -(8 << 16);
+            }
+        }
+    } else {
+        dust_spawned = false;
+    }
+
     bool snow = weather_state == WEATHER_STATE_SNOW;
     int windVx = weather_wind << 16;
     for (int index = 0; index < weather_particle_count; index++) {
@@ -251,7 +326,7 @@ bool weather_has_visuals()
         return false;
     }
 
-    if (weather_flash_active) {
+    if (weather_flash_active || dust_active || shimmer_active) {
         return true;
     }
 
@@ -266,6 +341,48 @@ void weather_render(unsigned char* buf, int pitch, Rect* rect, int bufWidth, int
 
     weather_area_width = bufWidth;
     weather_area_height = bufHeight;
+
+    // Wet-ground glow: glow-palette pixels (0xE5+, fires, monitors, energy)
+    // bleed a dim additive ghost a few rows downward with per-column jitter,
+    // reading as reflections on rain-slick ground. Palette-safe.
+    if (weather_reflections_enabled
+        && weather_intensity > 90
+        && (weather_state == WEATHER_STATE_RAIN || weather_state == WEATHER_STATE_STORM)) {
+        int t = (int)(get_time() >> 6);
+        int startY = rect->uly < 12 ? 12 : rect->uly;
+        for (int y = startY; y <= rect->lry; y++) {
+            unsigned char* row = buf + pitch * y;
+            for (int x = rect->ulx; x <= rect->lrx; x++) {
+                int d = 8 + ((((unsigned int)x * 2654435761u >> 28) + t) & 3);
+                unsigned char s = row[x - pitch * d];
+                if (s >= 0xE5) {
+                    unsigned char* p = row + x;
+                    if (*p < 0xE5) {
+                        *p = colorMixAddTable[*p][intensityColorTable[s][52]];
+                    }
+                }
+            }
+        }
+    }
+
+    // Heat shimmer: sparse 1px row displacements drifting upward.
+    if (shimmer_active) {
+        int t = (int)(get_time() / 45);
+        int width = rect->lrx - rect->ulx + 1;
+        if (width > 4) {
+            for (int y = rect->uly; y <= rect->lry; y++) {
+                int band = (y + t) % 26;
+                if (band < 2) {
+                    unsigned char* row = buf + pitch * y + rect->ulx;
+                    if ((((y + t) / 26) & 1) != 0) {
+                        memmove(row, row + 1, width - 1);
+                    } else {
+                        memmove(row + 1, row, width - 1);
+                    }
+                }
+            }
+        }
+    }
 
     bool snow = weather_state == WEATHER_STATE_SNOW;
     int slant = weather_wind / 24;
@@ -299,6 +416,19 @@ void weather_render(unsigned char* buf, int pitch, Rect* rect, int bufWidth, int
                 unsigned char* p = buf + pitch * sy + sx;
                 if (*p < 0xE5) {
                     *p = intensityColorTable[*p][segment == 0 ? 152 : 142];
+                }
+            }
+        }
+    }
+
+    if (dust_active) {
+        for (int index = 0; index < WEATHER_DUST_PARTICLES; index++) {
+            int x = dust_particles[index].x >> 16;
+            int y = dust_particles[index].y >> 16;
+            if (x >= rect->ulx && x <= rect->lrx && y >= rect->uly && y <= rect->lry) {
+                unsigned char* p = buf + pitch * y + x;
+                if (*p < 0xE5) {
+                    *p = intensityColorTable[*p][138];
                 }
             }
         }
