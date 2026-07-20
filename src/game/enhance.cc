@@ -21,7 +21,12 @@
 
 namespace fallout {
 
-#define FLICKER_BUCKET_COUNT 64
+// Flicker is sampled on a coarse grid of cells (1 << FLICKER_CELL_SHIFT tiles
+// per cell) and interpolated across tiles, so neighbouring tiles stay in step
+// instead of each picking an unrelated phase. The grid wraps, which keeps it
+// tiny; the repeat period is far wider than the screen.
+#define FLICKER_CELL_SHIFT 3
+#define FLICKER_GRID 8
 
 // Tint buckets for colored light: 0-1 cool, 2 neutral, 3-4 warm.
 #define TINT_BUCKET_COUNT 5
@@ -37,6 +42,8 @@ static void enhance_bk();
 static bool enhance_game_active();
 static void enhance_update_tint();
 static void enhance_update_flicker(unsigned int now);
+static int enhance_flicker_at(const int (*wave)[FLICKER_GRID], int tile);
+static int enhance_flicker_value(int elevation, int tile);
 static void enhance_time_of_day_tint(int* r, int* g, int* b);
 static int enhance_classify_warmth(Object* obj);
 static void enhance_build_tint_tables();
@@ -53,8 +60,11 @@ static bool wall_ao_enabled = true;
 static unsigned int last_bk_time;
 static unsigned int last_refresh_time;
 
-// Current flicker offsets, roughly -256..256, one per phase bucket.
-static int flicker_wave[FLICKER_BUCKET_COUNT];
+// Current flicker offsets, roughly -256..256, one per grid cell. Flames need a
+// restless wave, but lamps and daylight spilling in through a window only ever
+// drift - so two waves are kept and blended per tile by how warm its light is.
+static int flicker_fast[FLICKER_GRID][FLICKER_GRID];
+static int flicker_slow[FLICKER_GRID][FLICKER_GRID];
 
 // Screen-space horizontal shear of critter shadows (-128..128, applied as
 // x += shear * row / 256). Follows the sun during the day.
@@ -130,7 +140,8 @@ int enhance_init()
 
     last_bk_time = get_time();
     last_refresh_time = last_bk_time;
-    memset(flicker_wave, 0, sizeof(flicker_wave));
+    memset(flicker_fast, 0, sizeof(flicker_fast));
+    memset(flicker_slow, 0, sizeof(flicker_slow));
 
     add_bk_process(enhance_bk);
 
@@ -183,7 +194,7 @@ int enhance_render_light(int elevation, int tile)
 
     if (flicker_enabled && intensity > ambient) {
         int excess = intensity - ambient;
-        int wave = flicker_wave[(unsigned int)(tile * 2654435761u) >> 26];
+        int wave = enhance_flicker_value(elevation, tile);
         excess += ((excess * wave) >> 8) * 20 >> 8;
         intensity = ambient + excess;
     }
@@ -340,7 +351,9 @@ void enhance_scene_post_process(unsigned char* buf, int pitch, Rect* rect, int b
 
 void enhance_light_source_begin(Object* obj)
 {
-    light_source_warmth = colored_lights_enabled ? enhance_classify_warmth(obj) : 0;
+    // Warmth also drives flicker speed, so it is classified whenever either
+    // feature is on.
+    light_source_warmth = (colored_lights_enabled || flicker_enabled) ? enhance_classify_warmth(obj) : 0;
 }
 
 void enhance_light_source_end()
@@ -579,14 +592,14 @@ static void enhance_bk()
     enhance_update_tint();
 
     // Figure out how often the scene needs unprompted redraws: weather
-    // particles want ~30 fps, flicker is happy with ~10. Skip flicker
+    // particles want ~30 fps, flicker needs ~15 to stay smooth. Skip flicker
     // refreshes when ambient light is nearly maxed - above-ambient light
     // sources can't stand out and the flicker would be invisible.
     unsigned int interval = 0;
     if (weather_has_visuals()) {
         interval = 33;
     } else if (flicker_enabled && light_get_ambient() < LIGHT_LEVEL_MAX * 9 / 10) {
-        interval = 100;
+        interval = 66;
     }
 
     if (interval != 0 && elapsed_tocks(now, last_refresh_time) >= interval) {
@@ -595,17 +608,80 @@ static void enhance_bk()
     }
 }
 
+// Smoothstep on an 8-bit fraction, so cell seams have no visible crease.
+static inline int enhance_smooth_frac(int f)
+{
+    return f * f * (3 * 256 - 2 * f) >> 16;
+}
+
+// Bilinearly interpolated offset from one wave grid, roughly -256..256.
+static int enhance_flicker_at(const int (*wave)[FLICKER_GRID], int tile)
+{
+    int x = tile % HEX_GRID_WIDTH;
+    int y = tile / HEX_GRID_WIDTH;
+
+    int mask = (1 << FLICKER_CELL_SHIFT) - 1;
+    int fx = enhance_smooth_frac((x & mask) << (8 - FLICKER_CELL_SHIFT));
+    int fy = enhance_smooth_frac((y & mask) << (8 - FLICKER_CELL_SHIFT));
+
+    int cx = (x >> FLICKER_CELL_SHIFT) & (FLICKER_GRID - 1);
+    int cy = (y >> FLICKER_CELL_SHIFT) & (FLICKER_GRID - 1);
+    int cx1 = (cx + 1) & (FLICKER_GRID - 1);
+    int cy1 = (cy + 1) & (FLICKER_GRID - 1);
+
+    int top = wave[cy][cx] + ((wave[cy][cx1] - wave[cy][cx]) * fx >> 8);
+    int bottom = wave[cy1][cx] + ((wave[cy1][cx1] - wave[cy1][cx]) * fx >> 8);
+    return top + ((bottom - top) * fy >> 8);
+}
+
+// Flicker offset for a tile, roughly -256..256. Tiles lit by warm sources
+// (fires, braziers) get the fast wave; everything else - lamps, and daylight
+// coming in from outside - gets the slow one, with a blend in between so a
+// tile lit by both doesn't snap between the two.
+static int enhance_flicker_value(int elevation, int tile)
+{
+    int slow = enhance_flicker_at(flicker_slow, tile);
+
+    if (!elevationIsValid(elevation) || !hexGridTileIsValid(tile)) {
+        return slow;
+    }
+
+    int accum = warm_accum[elevation][tile];
+    if (accum <= 0) {
+        return slow;
+    }
+
+    // 655 is the empty-tile base, matching enhance_light_table.
+    int sourceLight = light_get_tile_true(elevation, tile) - 655;
+    if (sourceLight < 1024) {
+        return slow;
+    }
+
+    int warmth = std::clamp(accum * 256 / sourceLight, 0, 256);
+    int fast = enhance_flicker_at(flicker_fast, tile);
+    return slow + ((fast - slow) * warmth >> 8);
+}
+
 static void enhance_update_flicker(unsigned int now)
 {
     if (!flicker_enabled) {
         return;
     }
 
+    // Keep both waves slow enough that the ~15 fps refresh below samples them
+    // many times per cycle - faster waves land only a few samples per cycle
+    // and the flicker reads as stepping rather than breathing. The slow wave
+    // runs at a fifth of the flame rate, so steady light drifts rather than
+    // flickers.
     double t = now / 1000.0;
-    for (int index = 0; index < FLICKER_BUCKET_COUNT; index++) {
-        double phase = index * 0.7;
-        double wave = sin(t * 9.0 + phase) * 0.55 + sin(t * 15.3 + phase * 1.9) * 0.45;
-        flicker_wave[index] = (int)(wave * 256.0);
+    for (int cy = 0; cy < FLICKER_GRID; cy++) {
+        for (int cx = 0; cx < FLICKER_GRID; cx++) {
+            double phase = cx * 2.3 + cy * 3.7;
+            double fast = sin(t * 5.5 + phase) * 0.55 + sin(t * 9.1 + phase * 1.9) * 0.45;
+            double slow = sin(t * 1.1 + phase) * 0.55 + sin(t * 1.8 + phase * 1.9) * 0.45;
+            flicker_fast[cy][cx] = (int)(fast * 256.0);
+            flicker_slow[cy][cx] = (int)(slow * 256.0);
+        }
     }
 
     // Sun direction for shadows: sweeps across the day, overhead at noon.
