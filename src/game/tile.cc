@@ -19,6 +19,7 @@
 #include "plib/gnw/debug.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
+#include "plib/gnw/memory.h"
 
 namespace fallout {
 
@@ -244,6 +245,11 @@ static TileData** squares;
 // 0x668E40
 static unsigned char* buf;
 
+// Scratch buffer holding the vanilla left-half pixels during a SPLIT-mode
+// comparison frame. Grows on demand; freed in tile_exit.
+static unsigned char* compare_scratch = NULL;
+static int compare_scratch_size = 0;
+
 // Number of tiles vertically.
 //
 // Currently this value is always 200.
@@ -461,6 +467,11 @@ void tile_reset()
 // 0x49DE80
 void tile_exit()
 {
+    if (compare_scratch != NULL) {
+        mem_free(compare_scratch);
+        compare_scratch = NULL;
+        compare_scratch_size = 0;
+    }
 }
 
 // 0x49DE8C
@@ -594,6 +605,40 @@ static void refresh_mapper(Rect* rect, int elevation)
 }
 
 // 0x49E1CC
+// Renders the iso scene into `buf` for the given clipped rect, applying
+// whatever enhancement state is currently set (see enhance_set_bypass). Does
+// not blit - the caller owns presentation.
+static void render_scene(Rect* rect, int elevation)
+{
+    buf_fill(buf + buf_full * rect->uly + rect->ulx,
+        rectGetWidth(rect),
+        rectGetHeight(rect),
+        buf_full,
+        0);
+
+    square_render_floor(rect, elevation);
+    obj_render_pre_roof(rect, elevation);
+    square_render_roof(rect, elevation);
+    bounds_render(rect, elevation);
+    obj_render_post_roof(rect, elevation);
+    enhance_scene_post_process(buf, buf_full, rect, buf_width, buf_length);
+}
+
+static bool compare_ensure_scratch(int size)
+{
+    if (compare_scratch != NULL && compare_scratch_size >= size) {
+        return true;
+    }
+
+    if (compare_scratch != NULL) {
+        mem_free(compare_scratch);
+    }
+
+    compare_scratch = (unsigned char*)mem_malloc(size);
+    compare_scratch_size = compare_scratch != NULL ? size : 0;
+    return compare_scratch != NULL;
+}
+
 static void refresh_game(Rect* rect, int elevation)
 {
     Rect rectToUpdate;
@@ -602,18 +647,64 @@ static void refresh_game(Rect* rect, int elevation)
         return;
     }
 
-    buf_fill(buf + buf_full * rectToUpdate.uly + rectToUpdate.ulx,
-        rectGetWidth(&rectToUpdate),
-        rectGetHeight(&rectToUpdate),
-        buf_full,
-        0);
+    int mode = enhance_compare_mode();
 
-    square_render_floor(&rectToUpdate, elevation);
-    obj_render_pre_roof(&rectToUpdate, elevation);
-    square_render_roof(&rectToUpdate, elevation);
-    bounds_render(&rectToUpdate, elevation);
-    obj_render_post_roof(&rectToUpdate, elevation);
-    enhance_scene_post_process(buf, buf_full, &rectToUpdate, buf_width, buf_length);
+    if (mode != ENHANCE_COMPARE_SPLIT) {
+        // OLD renders one fully-vanilla pass; NEW renders one enhanced pass.
+        enhance_set_bypass(mode == ENHANCE_COMPARE_OLD);
+        render_scene(&rectToUpdate, elevation);
+        enhance_set_bypass(false);
+        blit(&rectToUpdate);
+        return;
+    }
+
+    // SPLIT: vanilla left of the seam, enhanced right. The seam is fixed at the
+    // window's horizontal center so it stays put as the map scrolls.
+    int seam = buf_width / 2;
+
+    if (rectToUpdate.ulx >= seam) {
+        // Entirely in the enhanced half.
+        render_scene(&rectToUpdate, elevation);
+    } else if (rectToUpdate.lrx < seam) {
+        // Entirely in the vanilla half.
+        enhance_set_bypass(true);
+        render_scene(&rectToUpdate, elevation);
+        enhance_set_bypass(false);
+    } else {
+        // Straddles the seam: render vanilla, stash the columns left of the
+        // seam, render enhanced over the top, then paste the vanilla columns
+        // back. Both halves come from the same frame, so the split is exact.
+        int leftWidth = seam - rectToUpdate.ulx;
+        int height = rectGetHeight(&rectToUpdate);
+
+        if (compare_ensure_scratch(leftWidth * height)) {
+            enhance_set_bypass(true);
+            render_scene(&rectToUpdate, elevation);
+            for (int row = 0; row < height; row++) {
+                memcpy(compare_scratch + row * leftWidth,
+                    buf + buf_full * (rectToUpdate.uly + row) + rectToUpdate.ulx,
+                    leftWidth);
+            }
+
+            enhance_set_bypass(false);
+            render_scene(&rectToUpdate, elevation);
+            for (int row = 0; row < height; row++) {
+                memcpy(buf + buf_full * (rectToUpdate.uly + row) + rectToUpdate.ulx,
+                    compare_scratch + row * leftWidth,
+                    leftWidth);
+            }
+        } else {
+            // Out of memory for the stash - fall back to an enhanced-only frame.
+            render_scene(&rectToUpdate, elevation);
+        }
+
+        // A one-pixel divider at the seam so the boundary is unmistakable.
+        int white = colorTable[0x7FFF];
+        for (int row = 0; row < height; row++) {
+            buf[buf_full * (rectToUpdate.uly + row) + seam] = white;
+        }
+    }
+
     blit(&rectToUpdate);
 }
 

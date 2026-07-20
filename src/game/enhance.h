@@ -55,6 +55,30 @@ void enhance_light_color_reset();
 // tile's visible light comes from a colored source.
 unsigned char (*enhance_light_table(int elevation, int tile))[256];
 
+// A/B comparison of the enhancements. Cycled at runtime with a debug key:
+//   NEW   - enhanced, the normal look (default)
+//   OLD   - every enhancement bypassed, the vanilla look
+//   SPLIT - vanilla in the left half of the iso window, enhanced in the right,
+//           both rendered from the same frame for a true side-by-side
+enum {
+    ENHANCE_COMPARE_NEW = 0,
+    ENHANCE_COMPARE_OLD,
+    ENHANCE_COMPARE_SPLIT,
+    ENHANCE_COMPARE_COUNT,
+};
+
+// Current comparison mode (one of ENHANCE_COMPARE_*).
+int enhance_compare_mode();
+
+// Advances to the next comparison mode, refreshes the scene, and returns a
+// short human-readable label for the new mode (for on-screen feedback).
+const char* enhance_compare_cycle();
+
+// When true, every enhancement resolves to its vanilla behavior. The renderer
+// toggles this around the two passes of a SPLIT-mode frame; it is also held
+// on for the duration of an OLD-mode frame.
+void enhance_set_bypass(bool bypass);
+
 } // namespace fallout
 
 #endif /* FALLOUT_GAME_ENHANCE_H_ */

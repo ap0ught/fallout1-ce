@@ -50,6 +50,13 @@ static void enhance_build_tint_tables();
 static void enhance_rebuild_ao();
 
 static bool enhance_initialized = false;
+
+// A/B comparison state. `compare_mode` is one of ENHANCE_COMPARE_*;
+// `enhance_bypass` is flipped on transiently by the renderer to force vanilla
+// output for a pass (see enhance_set_bypass).
+static int compare_mode = ENHANCE_COMPARE_NEW;
+static bool enhance_bypass = false;
+
 static bool tod_tint_enabled = true;
 static bool flicker_enabled = true;
 static bool shadows_enabled = true;
@@ -184,7 +191,36 @@ void enhance_exit()
 
 bool enhance_shadows_enabled()
 {
-    return shadows_enabled;
+    return shadows_enabled && !enhance_bypass;
+}
+
+int enhance_compare_mode()
+{
+    return compare_mode;
+}
+
+void enhance_set_bypass(bool bypass)
+{
+    enhance_bypass = bypass;
+}
+
+const char* enhance_compare_cycle()
+{
+    compare_mode = (compare_mode + 1) % ENHANCE_COMPARE_COUNT;
+
+    // The palette tint is a display-wide effect that cannot be split spatially,
+    // so update it up front for OLD/NEW and refresh the whole scene.
+    enhance_update_tint();
+    tile_refresh_display();
+
+    switch (compare_mode) {
+    case ENHANCE_COMPARE_OLD:
+        return "Enhancements: OFF (vanilla)";
+    case ENHANCE_COMPARE_SPLIT:
+        return "Enhancements: SPLIT (vanilla | enhanced)";
+    default:
+        return "Enhancements: ON";
+    }
 }
 
 int enhance_render_light(int elevation, int tile)
@@ -192,7 +228,7 @@ int enhance_render_light(int elevation, int tile)
     int ambient = light_get_ambient();
     int intensity = light_get_tile(elevation, tile);
 
-    if (flicker_enabled && intensity > ambient) {
+    if (flicker_enabled && !enhance_bypass && intensity > ambient) {
         int excess = intensity - ambient;
         int wave = enhance_flicker_value(elevation, tile);
         excess += ((excess * wave) >> 8) * 20 >> 8;
@@ -203,15 +239,17 @@ int enhance_render_light(int elevation, int tile)
         intensity = ambient;
     }
 
-    int dim = weather_light_dim();
-    if (dim != 256) {
-        intensity = intensity * dim >> 8;
-        if (intensity < LIGHT_LEVEL_MIN) {
-            intensity = LIGHT_LEVEL_MIN;
+    if (!enhance_bypass) {
+        int dim = weather_light_dim();
+        if (dim != 256) {
+            intensity = intensity * dim >> 8;
+            if (intensity < LIGHT_LEVEL_MIN) {
+                intensity = LIGHT_LEVEL_MIN;
+            }
         }
     }
 
-    if (wall_ao_enabled && elevationIsValid(elevation) && hexGridTileIsValid(tile)) {
+    if (wall_ao_enabled && !enhance_bypass && elevationIsValid(elevation) && hexGridTileIsValid(tile)) {
         int ao = ao_map[elevation][tile];
         if (ao != 0) {
             intensity -= intensity * ao >> 8;
@@ -232,11 +270,13 @@ int enhance_render_ambient()
 {
     int ambient = light_get_ambient();
 
-    int dim = weather_light_dim();
-    if (dim != 256) {
-        ambient = ambient * dim >> 8;
-        if (ambient < LIGHT_LEVEL_MIN) {
-            ambient = LIGHT_LEVEL_MIN;
+    if (!enhance_bypass) {
+        int dim = weather_light_dim();
+        if (dim != 256) {
+            ambient = ambient * dim >> 8;
+            if (ambient < LIGHT_LEVEL_MIN) {
+                ambient = LIGHT_LEVEL_MIN;
+            }
         }
     }
 
@@ -296,7 +336,7 @@ void enhance_render_shadow(unsigned char* frameData, int frameWidth, int frameHe
 
 void enhance_scene_post_process(unsigned char* buf, int pitch, Rect* rect, int bufWidth, int bufHeight)
 {
-    if (!enhance_initialized) {
+    if (!enhance_initialized || enhance_bypass) {
         return;
     }
 
@@ -382,7 +422,7 @@ void enhance_light_color_reset()
 
 unsigned char (*enhance_light_table(int elevation, int tile))[256]
 {
-    if (!colored_lights_enabled || !elevationIsValid(elevation) || !hexGridTileIsValid(tile)) {
+    if (!colored_lights_enabled || enhance_bypass || !elevationIsValid(elevation) || !hexGridTileIsValid(tile)) {
         return intensityColorTable;
     }
 
@@ -695,6 +735,13 @@ static void enhance_update_flicker(unsigned int now)
 
 static void enhance_update_tint()
 {
+    // The palette tint is applied to the whole display at present time, so it
+    // cannot be confined to one half in SPLIT mode - only OLD suppresses it.
+    if (compare_mode == ENHANCE_COMPARE_OLD) {
+        colorSetDisplayTint(256, 256, 256);
+        return;
+    }
+
     int todR = 256;
     int todG = 256;
     int todB = 256;
