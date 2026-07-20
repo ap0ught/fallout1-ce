@@ -230,9 +230,14 @@ void win_exit(void)
                 mem_free(screen_buffer);
             }
 
+            // CE: Input teardown must precede `svga_exit`. Anything it needs to
+            // hand back to SDL (mouse grabs, relative mode) is silently ignored
+            // once the video subsystem has been shut down and the window
+            // destroyed.
+            GNW_input_exit();
+
             svga_exit();
 
-            GNW_input_exit();
             GNW_rect_exit();
             GNW_text_exit();
             colorsClose();
