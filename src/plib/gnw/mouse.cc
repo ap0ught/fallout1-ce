@@ -54,6 +54,12 @@ static unsigned char* mouse_fptr = NULL;
 // 0x539DD0
 static double mouse_sensitivity = 1.0;
 
+// Fractional remainders left over from scaling raw deltas by the sensitivity.
+// Carried across frames so that slow movement (common on trackpads, and with
+// sensitivity below 1.0) is not truncated away to zero.
+static double mouse_sensitivity_remainder_x = 0.0;
+static double mouse_sensitivity_remainder_y = 0.0;
+
 // 0x539DDC
 static int last_buttons = 0;
 
@@ -497,9 +503,17 @@ void mouse_info()
         y = 0;
     }
 
-    // Adjust for mouse senstivity.
-    x = (int)(x * mouse_sensitivity);
-    y = (int)(y * mouse_sensitivity);
+    // Adjust for mouse senstivity. Truncation towards zero would swallow small
+    // deltas entirely when sensitivity is below 1.0, so the dropped fraction is
+    // carried over into the next sample.
+    double scaled_x = x * mouse_sensitivity + mouse_sensitivity_remainder_x;
+    double scaled_y = y * mouse_sensitivity + mouse_sensitivity_remainder_y;
+
+    x = (int)scaled_x;
+    y = (int)scaled_y;
+
+    mouse_sensitivity_remainder_x = scaled_x - x;
+    mouse_sensitivity_remainder_y = scaled_y - y;
 
     if (vcr_state == VCR_STATE_PLAYING) {
         if (((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_PRESS) != 0 && buttons != 0)
@@ -797,8 +811,10 @@ bool mouse_is_disabled()
 // 0x4B54C4
 void mouse_set_sensitivity(double value)
 {
-    if (value > 0 && value < 2.0) {
+    if (value >= 0.25 && value <= 2.5) {
         mouse_sensitivity = value;
+        mouse_sensitivity_remainder_x = 0.0;
+        mouse_sensitivity_remainder_y = 0.0;
     }
 }
 
