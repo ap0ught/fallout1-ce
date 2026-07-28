@@ -15,6 +15,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.os.*;
 
+import com.alexbatalov.falloutce.R;
+
 //import com.android.internal.util.HexDump;
 
 import java.lang.Runnable;
@@ -556,12 +558,12 @@ class HIDDeviceBLESteamController extends BluetoothGattCallback implements HIDDe
 
     @Override
     public String getManufacturerName() {
-        return "Valve Corporation";
+        return mManager.getContext().getString(R.string.valve_corporation);
     }
 
     @Override
     public String getProductName() {
-        return "Steam Controller";
+        return mManager.getContext().getString(R.string.steam_controller);
     }
 
     @Override

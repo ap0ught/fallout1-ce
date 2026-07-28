@@ -2,4 +2,14 @@
     <string name="app_name">Fallout</string>
     <string name="loading_dialog_title">PLEASE STAND BY</string>
     <string name="loading_dialog_message">Copying files…</string>
+    <string name="sdl_error_title">SDL Error</string>
+    <string name="sdl_error_msg">An error occurred while trying to start the application. Please try again and/or reinstall.\n\nError: %1$s</string>
+    <string name="sdl_error_version_mismatch">SDL C/Java version mismatch (expected %1$s, got %2$s)</string>
+    <string name="exit_button">Exit</string>
+    <string name="valve_corporation">Valve Corporation</string>
+    <string name="steam_controller">Steam Controller</string>
+    <string name="lib_name">fallout-ce</string>
+    <string name="config_file_name">fallout.cfg</string>
+    <string name="master_dat_name">master.dat</string>
+    <string name="critter_dat_name">critter.dat</string>
 </resources>

@@ -50,6 +50,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alexbatalov.falloutce.R;
+
 import java.util.Hashtable;
 import java.util.Locale;
 
@@ -352,19 +354,16 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             String version = nativeGetVersion();
             if (!version.equals(expected_version)) {
                 mBrokenLibraries = true;
-                errorMsgBrokenLib = "SDL C/Java version mismatch (expected " + expected_version + ", got " + version + ")";
+                errorMsgBrokenLib = getString(R.string.sdl_error_version_mismatch, expected_version, version);
             }
         }
 
         if (mBrokenLibraries) {
             mSingleton = this;
             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-            dlgAlert.setMessage("An error occurred while trying to start the application. Please try again and/or reinstall."
-                  + System.getProperty("line.separator")
-                  + System.getProperty("line.separator")
-                  + "Error: " + errorMsgBrokenLib);
-            dlgAlert.setTitle("SDL Error");
-            dlgAlert.setPositiveButton("Exit",
+            dlgAlert.setMessage(getString(R.string.sdl_error_msg, errorMsgBrokenLib));
+            dlgAlert.setTitle(R.string.sdl_error_title);
+            dlgAlert.setPositiveButton(R.string.exit_button,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog,int id) {

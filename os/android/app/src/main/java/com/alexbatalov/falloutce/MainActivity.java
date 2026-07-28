@@ -16,10 +16,10 @@ public class MainActivity extends SDLActivity {
 
         final File externalFilesDir = getExternalFilesDir(null);
 
-        final File configFile = new File(externalFilesDir, "fallout.cfg");
+        final File configFile = new File(externalFilesDir, getString(R.string.config_file_name));
         if (!configFile.exists()) {
-            final File masterDatFile = new File(externalFilesDir, "master.dat");
-            final File critterDatFile = new File(externalFilesDir, "critter.dat");
+            final File masterDatFile = new File(externalFilesDir, getString(R.string.master_dat_name));
+            final File critterDatFile = new File(externalFilesDir, getString(R.string.critter_dat_name));
             if (!masterDatFile.exists() || !critterDatFile.exists()) {
                 final Intent intent = new Intent(this, ImportActivity.class);
                 startActivity(intent);
@@ -44,7 +44,7 @@ public class MainActivity extends SDLActivity {
     @Override
     protected String[] getLibraries() {
         return new String[]{
-            "fallout-ce",
+            getString(R.string.lib_name),
         };
     }
 }
