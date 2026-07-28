@@ -569,6 +569,22 @@ int tile_set_center(int tile, int flags)
     return 0;
 }
 
+// Shifts the rendered view by a raw pixel amount without changing the
+// center tile. The hex and square (floor) layers move in lockstep so they
+// don't shear apart, and hit-testing stays consistent because tile_num()
+// derives from the same offsets. Callers are responsible for keeping the
+// shift small (within a tile or two) and for refreshing the display.
+// Added for the exploration follow-cam's glide; see dude_camera_follow().
+void tile_pixel_shift(int dx, int dy)
+{
+    tile_offx += dx;
+    tile_offy += dy;
+    square_offx += dx;
+    square_offy += dy;
+
+    tile_update_bounds_rect();
+}
+
 // 0x49E138
 static void refresh_mapper(Rect* rect, int elevation)
 {

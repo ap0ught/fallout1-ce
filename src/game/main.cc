@@ -14,6 +14,7 @@
 #include <stddef.h>
 
 #include "game/amutex.h"
+#include "game/anim.h"
 #include "game/art.h"
 #include "game/credits.h"
 #include "game/cycle.h"
@@ -324,6 +325,13 @@ static void main_game_loop()
 
         int keyCode = get_input();
         game_handle_input(keyCode, false);
+
+        // Continuous WASD walking (exploration only). Polls held keys each
+        // frame and steps the dude one tile at a time.
+        dude_wasd_process();
+
+        // Follow-cam: keep the view on the dude while he moves.
+        dude_camera_follow();
 
         scripts_check_state();
 

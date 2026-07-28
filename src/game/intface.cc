@@ -519,7 +519,9 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    automapButton = win_register_button(interfaceWindow, 526, 40, 41, 19, -1, -1, -1, KEY_TAB, automapButtonUp, automapButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
+    // Emits M (not the vanilla Tab): Tab now opens the inventory, so the
+    // button must synthesize the automap's new key.
+    automapButton = win_register_button(interfaceWindow, 526, 40, 41, 19, -1, -1, -1, KEY_LOWERCASE_M, automapButtonUp, automapButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
     if (automapButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);

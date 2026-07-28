@@ -3050,6 +3050,171 @@ int dude_run(int action_points)
     return register_end();
 }
 
+// Maps the currently held WASD keys onto one of the six hex rotations.
+// Diagonals (e.g. W+D) select the corner directions; pressing W or S alone has
+// no pure hex equivalent, so we alternate the two upper/lower diagonals each
+// step to keep travel reading as roughly straight up/down on screen. Returns a
+// ROTATION_* value, or -1 when no movement key is held.
+static int dude_wasd_rotation()
+{
+    bool w = keys[SDL_SCANCODE_W] != 0;
+    bool a = keys[SDL_SCANCODE_A] != 0;
+    bool s = keys[SDL_SCANCODE_S] != 0;
+    bool d = keys[SDL_SCANCODE_D] != 0;
+
+    if (w && d) return ROTATION_NE;
+    if (w && a) return ROTATION_NW;
+    if (s && d) return ROTATION_SE;
+    if (s && a) return ROTATION_SW;
+    if (d) return ROTATION_E;
+    if (a) return ROTATION_W;
+
+    if (w || s) {
+        static bool flip = false;
+        flip = !flip;
+        if (w) return flip ? ROTATION_NE : ROTATION_NW;
+        return flip ? ROTATION_SE : ROTATION_SW;
+    }
+
+    return -1;
+}
+
+// Drives continuous WASD walking. Called once per frame from main_game_loop().
+// Steps the dude one tile in the direction selected by the held keys, chaining
+// the next step only once the current one finishes. Exploration only - it is a
+// no-op in combat, so turn-based action-point movement is unaffected.
+void dude_wasd_process()
+{
+    // Only when the normal interface is up and keyboard input is live.
+    if (!intface_is_enabled() || kb_is_disabled()) {
+        return;
+    }
+
+    // Leave turn-based combat movement exactly as vanilla.
+    if (isInCombat()) {
+        return;
+    }
+
+    // Wait for the in-progress step (if any) to complete before queuing
+    // another, so a held key walks one tile at a time rather than stacking up.
+    if (anim_busy(obj_dude)) {
+        return;
+    }
+
+    int rotation = dude_wasd_rotation();
+    if (rotation == -1) {
+        return;
+    }
+
+    int dest = tile_num_in_direction(obj_dude->tile, rotation, 1);
+    if (dest == obj_dude->tile) {
+        // Edge of the map - tile_num_in_direction clamps to the same tile.
+        return;
+    }
+
+    // Mirror the click-to-move running preference (Shift inverts it).
+    bool running;
+    configGetBool(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_RUNNING_KEY, &running);
+    if (keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT]) {
+        running = !running;
+    }
+
+    register_begin(ANIMATION_REQUEST_RESERVED);
+    if (running) {
+        if (!perk_level(PERK_SILENT_RUNNING)) {
+            pc_flag_off(PC_FLAG_SNEAKING);
+        }
+        register_object_run_to_tile(obj_dude, dest, obj_dude->elevation, -1, 0);
+    } else {
+        register_object_move_to_tile(obj_dude, dest, obj_dude->elevation, -1, 0);
+    }
+    register_end();
+}
+
+// Keeps the view centered on the dude while he moves during exploration
+// (WASD or click-to-move alike). Called once per frame from
+// main_game_loop(). Only recenters when his tile actually changes, so
+// mouse-edge free look still works while standing still. Combat is left
+// alone - it centers on whoever's turn it is - and scripted sequences
+// (interface disabled) keep control of their own camera. Without the
+// ignore-restrictions flag, tile_set_center() refuses to scroll past map
+// bounds, so the camera parks at the edge just like manual scrolling.
+//
+// To read as smooth rather than one-tile snaps, each recenter is hidden
+// behind a pixel "lag": the moment the view jumps to the new center, the
+// same jump is applied back as a tile_pixel_shift(), so nothing visibly
+// moves - then the lag decays a fraction per frame and the world glides
+// under the dude. A step arriving mid-glide folds the leftover into the
+// new lag, so running never causes the camera to fall behind by more
+// than a couple of tiles.
+void dude_camera_follow()
+{
+    // Pixel offset still to be worked off (the glide), and the portion of
+    // it currently baked into the tile renderer's offsets.
+    static int lagX = 0;
+    static int lagY = 0;
+    static int appliedX = 0;
+    static int appliedY = 0;
+    static int lastTile = -1;
+
+    if (!intface_is_enabled() || isInCombat()) {
+        // Someone else (combat, dialog, map load) owns the camera and will
+        // recanonicalize the offsets, so drop any glide in progress rather
+        // than resume a stale pan when control returns.
+        lagX = lagY = 0;
+        appliedX = appliedY = 0;
+        lastTile = obj_dude->tile;
+        return;
+    }
+
+    if (obj_dude->tile != lastTile) {
+        lastTile = obj_dude->tile;
+
+        int beforeX;
+        int beforeY;
+        tile_coord(obj_dude->tile, &beforeX, &beforeY, map_elevation);
+
+        // Recenter instantly; on success the offsets are canonical again
+        // (our applied shift is wiped), and the on-screen jump the player
+        // would have seen becomes the new lag to glide away. On failure
+        // (map border) the camera stays parked and any glide continues.
+        if (tile_set_center(obj_dude->tile, 0) == 0) {
+            int afterX;
+            int afterY;
+            tile_coord(obj_dude->tile, &afterX, &afterY, map_elevation);
+
+            lagX = beforeX - afterX;
+            lagY = beforeY - afterY;
+            appliedX = 0;
+            appliedY = 0;
+        }
+    }
+
+    if (lagX == 0 && lagY == 0 && appliedX == 0 && appliedY == 0) {
+        return;
+    }
+
+    // Work off roughly a sixth of the remaining lag per frame, always at
+    // least one pixel so the glide actually terminates.
+    if (lagX != 0) {
+        int stepX = lagX / 6;
+        if (stepX == 0) stepX = (lagX > 0) ? 1 : -1;
+        lagX -= stepX;
+    }
+    if (lagY != 0) {
+        int stepY = lagY / 6;
+        if (stepY == 0) stepY = (lagY > 0) ? 1 : -1;
+        lagY -= stepY;
+    }
+
+    if (lagX != appliedX || lagY != appliedY) {
+        tile_pixel_shift(lagX - appliedX, lagY - appliedY);
+        appliedX = lagX;
+        appliedY = lagY;
+        tile_refresh_display();
+    }
+}
+
 // 0x417AB0
 void dude_fidget()
 {

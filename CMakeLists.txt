@@ -5,13 +5,8 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set(EXECUTABLE_NAME fallout-ce)
 
 if (APPLE)
-    if(IOS)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "12" CACHE STRING "")
-        set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "")
-    else()
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
-        set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "")
-    endif()
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "")
 endif()
 
 project(${EXECUTABLE_NAME})
@@ -23,11 +18,7 @@ set(CMAKE_CXX_EXTENSIONS NO)
 option(ASAN "Enable address sanitizer" OFF)
 option(UBSAN "Enable undefined behaviour sanitizer" OFF)
 
-if (ANDROID)
-    add_library(${EXECUTABLE_NAME} SHARED)
-else()
-    add_executable(${EXECUTABLE_NAME} WIN32 MACOSX_BUNDLE)
-endif()
+add_executable(${EXECUTABLE_NAME} WIN32 MACOSX_BUNDLE)
 
 if(ASAN)
     target_compile_options(${EXECUTABLE_NAME} PUBLIC "-fsanitize=address;-fsanitize-recover=address")
@@ -268,16 +259,7 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/platform_compat.h"
     "src/pointer_registry.cc"
     "src/pointer_registry.h"
-    "src/plib/gnw/touch.cc"
-    "src/plib/gnw/touch.h"
 )
-
-if(IOS)
-    target_sources(${EXECUTABLE_NAME} PUBLIC
-        "src/platform/ios/paths.h"
-        "src/platform/ios/paths.mm"
-    )
-endif()
 
 if(WIN32)
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
@@ -302,43 +284,23 @@ if (WIN32)
 endif()
 
 if(APPLE)
-    if(IOS)
-        set(RESOURCES
-            "os/ios/AppIcon.xcassets"
-            "os/ios/LaunchScreen.storyboard"
-        )
+    set(RESOURCES
+        "os/macos/fallout-ce.icns"
+    )
 
-        target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
-        set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
+    set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-        set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/ios/Info.plist"
-            XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.alexbatalov.fallout-ce"
-            XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
-        )
+    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        OUTPUT_NAME "Fallout Community Edition"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/macos/Info.plist"
+        XCODE_ATTRIBUTE_EXECUTABLE_NAME "${EXECUTABLE_NAME}"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.alexbatalov.fallout-ce"
+    )
 
-        set(MACOSX_BUNDLE_BUNDLE_NAME "${EXECUTABLE_NAME}")
-        set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
-    else()
-        set(RESOURCES
-            "os/macos/fallout-ce.icns"
-        )
-
-        target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
-        set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-
-        set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-            OUTPUT_NAME "Fallout Community Edition"
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/macos/Info.plist"
-            XCODE_ATTRIBUTE_EXECUTABLE_NAME "${EXECUTABLE_NAME}"
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.alexbatalov.fallout-ce"
-        )
-
-        set(MACOSX_BUNDLE_ICON_FILE "fallout-ce.icns")
-        set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout: Community Edition")
-        set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
-    endif()
+    set(MACOSX_BUNDLE_ICON_FILE "fallout-ce.icns")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout: Community Edition")
+    set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
 
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.alexbatalov.fallout-ce")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0")
@@ -361,20 +323,11 @@ target_link_libraries(${EXECUTABLE_NAME} ${SDL2_LIBRARIES})
 target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
 
 if(APPLE)
-    if(IOS)
-        install(TARGETS ${EXECUTABLE_NAME} DESTINATION "Payload")
+    install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
 
-        set(CPACK_GENERATOR "ZIP")
-        set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-        set(CPACK_PACKAGE_FILE_NAME "fallout-ce")
-        set(CPACK_ARCHIVE_FILE_EXTENSION "ipa")
-    else()
-        install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
-
-        set(CPACK_GENERATOR "DragNDrop")
-        set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
-        set(CPACK_PACKAGE_FILE_NAME "Fallout Community Edition")
-    endif()
+    set(CPACK_GENERATOR "DragNDrop")
+    set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
+    set(CPACK_PACKAGE_FILE_NAME "Fallout Community Edition")
 
     include(CPack)
 endif()
