@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 34
 
     defaultConfig {
         applicationId 'com.alexbatalov.falloutce'
         minSdk 21
-        targetSdk 32
+        targetSdk 34
         versionCode 3
         versionName '1.0.0'
         externalNativeBuild {
