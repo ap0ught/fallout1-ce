@@ -14,6 +14,7 @@
 #include "game/display.h"
 #include "game/editor.h"
 #include "game/endgame.h"
+#include "game/enhance.h"
 #include "game/fontmgr.h"
 #include "game/gconfig.h"
 #include "game/gdialog.h"
@@ -868,6 +869,14 @@ int game_handle_input(int eventCode, bool isInCombatMode)
             getverstr(version, sizeof(version));
             display_print(version);
             display_print(version_build_time);
+        }
+        break;
+    case KEY_GRAVE:
+        // Cycle the visual-enhancement comparison: enhanced / vanilla / split.
+        if (1) {
+            char msg[64];
+            snprintf(msg, sizeof(msg), "%s", enhance_compare_cycle());
+            display_print(msg);
         }
         break;
     case KEY_ARROW_LEFT:

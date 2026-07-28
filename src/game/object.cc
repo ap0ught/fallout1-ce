@@ -9,6 +9,7 @@
 #include "game/art.h"
 #include "game/combat.h"
 #include "game/critter.h"
+#include "game/enhance.h"
 #include "game/game.h"
 #include "game/gconfig.h"
 #include "game/gmouse.h"
@@ -785,7 +786,6 @@ void obj_render_pre_roof(Rect* rect, int elevation)
         return;
     }
 
-    int ambientIntensity = light_get_ambient();
     int minX = updatedRect.ulx - 320;
     int minY = updatedRect.uly - 240;
     int maxX = updatedRect.lrx + 320;
@@ -811,7 +811,7 @@ void obj_render_pre_roof(Rect* rect, int elevation)
 
             int lightIntensity;
             if (objectListNode != NULL) {
-                lightIntensity = std::max(ambientIntensity, light_get_tile(elevation, objectListNode->obj->tile));
+                lightIntensity = enhance_render_light(elevation, objectListNode->obj->tile);
             }
 
             while (objectListNode != NULL) {
@@ -849,7 +849,7 @@ void obj_render_pre_roof(Rect* rect, int elevation)
 
         ObjectListNode* objectListNode = renderTable[i];
         if (objectListNode != NULL) {
-            lightIntensity = std::max(ambientIntensity, light_get_tile(elevation, objectListNode->obj->tile));
+            lightIntensity = enhance_render_light(elevation, objectListNode->obj->tile);
         }
 
         while (objectListNode != NULL) {
@@ -2260,6 +2260,14 @@ void obj_bound(Object* obj, Rect* rect)
 
     art_ptr_unlock(artHandle);
 
+    // CE: the projected shadow reaches sideways beyond the sprite; widen the
+    // invalidation rect so moving critters don't leave shadow trails.
+    if (enhance_shadows_enabled() && obj->tile != -1 && FID_TYPE(obj->fid) == OBJ_TYPE_CRITTER) {
+        int margin = height / 6 + 2;
+        rect->ulx -= margin;
+        rect->lrx += margin;
+    }
+
     if (isOutlined) {
         rect->ulx--;
         rect->uly--;
@@ -2524,6 +2532,37 @@ void dark_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int 
             if (b != 0) {
                 if (b < 0xE5) {
                     b = intensityColorTable[b][lightModifier];
+                }
+
+                *dp = b;
+            }
+
+            sp++;
+            dp++;
+        }
+
+        sp += srcStep;
+        dp += destStep;
+    }
+}
+
+// CE: `dark_trans_buf_to_buf` with a selectable intensity lookup table so
+// tiles lit by colored sources can use warm/cool tinted variants.
+void dark_trans_buf_to_buf_lut(unsigned char* src, int srcWidth, int srcHeight, int srcPitch, unsigned char* dest, int destX, int destY, int destPitch, int light, unsigned char (*lut)[256])
+{
+    unsigned char* sp = src;
+    unsigned char* dp = dest + destPitch * destY + destX;
+
+    int srcStep = srcPitch - srcWidth;
+    int destStep = destPitch - srcWidth;
+    int lightModifier = light >> 9;
+
+    for (int y = 0; y < srcHeight; y++) {
+        for (int x = 0; x < srcWidth; x++) {
+            unsigned char b = *sp;
+            if (b != 0) {
+                if (b < 0xE5) {
+                    b = lut[b][lightModifier];
                 }
 
                 *dp = b;
@@ -3734,6 +3773,10 @@ static int obj_adjust_light(Object* obj, int a2, Rect* rect)
         return -1;
     }
 
+    // CE: classify this source's light color for the render-side tracker;
+    // every add/subtract below is mirrored there with this warmth.
+    enhance_light_source_begin(obj);
+
     AdjustLightIntensityProc* adjustLightIntensity = a2 ? light_subtract_from_tile : light_add_to_tile;
     adjustLightIntensity(obj->elevation, obj->tile, obj->lightIntensity);
 
@@ -4374,6 +4417,8 @@ static int obj_adjust_light(Object* obj, int a2, Rect* rect)
         rect_min_bound(rect, &objectRect, rect);
     }
 
+    enhance_light_source_end();
+
     return 0;
 }
 
@@ -4666,6 +4711,21 @@ static void obj_render_object(Object* object, Rect* rect, int light)
         object->sy = objectRect.uly;
     }
 
+    // CE: projected ground shadow for living critters. Drawn before the
+    // sprite (and before the clip check - the shadow reaches outside the
+    // sprite rect and clips itself against the update rect).
+    if (type == OBJ_TYPE_CRITTER
+        && object->tile != -1
+        && enhance_shadows_enabled()
+        && (object->flags & OBJECT_FLAG_0xFC000) == 0
+        && !critter_is_dead(object)
+        && !critter_is_prone(object)) {
+        unsigned char* frameData = art_frame_data(art, object->frame, object->rotation);
+        if (frameData != NULL) {
+            enhance_render_shadow(frameData, frameWidth, frameHeight, object->sx, object->sy, rect, back_buf, buf_full, light);
+        }
+    }
+
     if (rect_inside_bound(&objectRect, rect, &objectRect) != 0) {
         art_ptr_unlock(cacheEntry);
         return;
@@ -4783,7 +4843,7 @@ static void obj_render_object(Object* object, Rect* rect, int light)
                         Rect* v21 = &(rects[i]);
                         if (v21->ulx <= v21->lrx && v21->uly <= v21->lry) {
                             unsigned char* sp = src + frameWidth * (v21->uly - objectRect.uly) + (v21->ulx - objectRect.ulx);
-                            dark_trans_buf_to_buf(sp, v21->lrx - v21->ulx + 1, v21->lry - v21->uly + 1, frameWidth, back_buf, v21->ulx, v21->uly, buf_full, light);
+                            dark_trans_buf_to_buf_lut(sp, v21->lrx - v21->ulx + 1, v21->lry - v21->uly + 1, frameWidth, back_buf, v21->ulx, v21->uly, buf_full, light, enhance_light_table(object->elevation, object->tile));
                         }
                     }
 
@@ -4825,7 +4885,7 @@ static void obj_render_object(Object* object, Rect* rect, int light)
         dark_translucent_trans_buf_to_buf(src, objectWidth, objectHeight, frameWidth, back_buf, objectRect.ulx, objectRect.uly, buf_full, light, energyBlendTable, commonGrayTable);
         break;
     default:
-        dark_trans_buf_to_buf(src, objectWidth, objectHeight, frameWidth, back_buf, objectRect.ulx, objectRect.uly, buf_full, light);
+        dark_trans_buf_to_buf_lut(src, objectWidth, objectHeight, frameWidth, back_buf, objectRect.ulx, objectRect.uly, buf_full, light, enhance_light_table(object->elevation, object->tile));
         break;
     }
 

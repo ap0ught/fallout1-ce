@@ -247,13 +247,53 @@ void setBlackSystemPalette()
     setSystemPalette(tmp);
 }
 
+// CE: Display-only tint applied on top of gamma when uploading the palette to
+// the video layer (256 = neutral per channel). Used for time-of-day and
+// weather mood grading. Does not affect color matching tables or `systemCmap`,
+// so gameplay-visible colors and palette effects stay untouched.
+static int displayTint[3] = { 256, 256, 256 };
+
+static inline unsigned char applyDisplayTint(unsigned char value, int channel)
+{
+    int tint = displayTint[channel];
+    if (tint == 256) {
+        return value;
+    }
+
+    int tinted = value * tint >> 8;
+    if (tinted > 63) {
+        tinted = 63;
+    }
+    return (unsigned char)tinted;
+}
+
+void colorSetDisplayTint(int r, int g, int b)
+{
+    int channels[3] = { r, g, b };
+    bool changed = false;
+
+    for (int index = 0; index < 3; index++) {
+        int tint = std::clamp(channels[index], 64, 512);
+        if (displayTint[index] != tint) {
+            displayTint[index] = tint;
+            changed = true;
+        }
+    }
+
+    if (changed && colorsInited) {
+        // Reupload the current palette with the new tint. `setSystemPalette`
+        // copies `systemCmap` onto itself, which is safe.
+        setSystemPalette(systemCmap);
+    }
+}
+
 // 0x4BFFA4
 void setSystemPalette(unsigned char* palette)
 {
     unsigned char newPalette[768];
 
     for (int index = 0; index < 768; index++) {
-        newPalette[index] = currentGammaTable[palette[index]];
+        newPalette[index] = applyDisplayTint(currentGammaTable[palette[index]], index % 3);
         systemCmap[index] = palette[index];
     }
 
@@ -273,9 +313,9 @@ void setSystemPaletteEntries(unsigned char* palette, int start, int end)
 
     int length = end - start + 1;
     for (int index = 0; index < length; index++) {
-        newPalette[index * 3] = currentGammaTable[palette[index * 3]];
-        newPalette[index * 3 + 1] = currentGammaTable[palette[index * 3 + 1]];
-        newPalette[index * 3 + 2] = currentGammaTable[palette[index * 3 + 2]];
+        newPalette[index * 3] = applyDisplayTint(currentGammaTable[palette[index * 3]], 0);
+        newPalette[index * 3 + 1] = applyDisplayTint(currentGammaTable[palette[index * 3 + 1]], 1);
+        newPalette[index * 3 + 2] = applyDisplayTint(currentGammaTable[palette[index * 3 + 2]], 2);
 
         systemCmap[start * 3 + index * 3] = palette[index * 3];
         systemCmap[start * 3 + index * 3 + 1] = palette[index * 3 + 1];

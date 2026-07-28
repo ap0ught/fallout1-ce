@@ -59,6 +59,7 @@ void freeColorBlendTable(int a1);
 void colorRegisterAlloc(ColorMallocFunc* mallocProc, ColorReallocFunc* reallocProc, ColorFreeFunc* freeProc);
 void colorGamma(double value);
 double colorGetGamma();
+void colorSetDisplayTint(int r, int g, int b);
 int colorMappedColor(ColorIndex i);
 bool colorPushColorPalette();
 bool colorPopColorPalette();

@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include "game/config.h"
+#include "game/enhance.h"
 #include "game/gconfig.h"
 #include "game/gmouse.h"
 #include "game/light.h"
@@ -18,6 +19,7 @@
 #include "plib/gnw/debug.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
+#include "plib/gnw/memory.h"
 
 namespace fallout {
 
@@ -243,6 +245,11 @@ static TileData** squares;
 // 0x668E40
 static unsigned char* buf;
 
+// Scratch buffer holding the vanilla left-half pixels during a SPLIT-mode
+// comparison frame. Grows on demand; freed in tile_exit.
+static unsigned char* compare_scratch = NULL;
+static int compare_scratch_size = 0;
+
 // Number of tiles vertically.
 //
 // Currently this value is always 200.
@@ -460,6 +467,11 @@ void tile_reset()
 // 0x49DE80
 void tile_exit()
 {
+    if (compare_scratch != NULL) {
+        mem_free(compare_scratch);
+        compare_scratch = NULL;
+        compare_scratch_size = 0;
+    }
 }
 
 // 0x49DE8C
@@ -593,6 +605,40 @@ static void refresh_mapper(Rect* rect, int elevation)
 }
 
 // 0x49E1CC
+// Renders the iso scene into `buf` for the given clipped rect, applying
+// whatever enhancement state is currently set (see enhance_set_bypass). Does
+// not blit - the caller owns presentation.
+static void render_scene(Rect* rect, int elevation)
+{
+    buf_fill(buf + buf_full * rect->uly + rect->ulx,
+        rectGetWidth(rect),
+        rectGetHeight(rect),
+        buf_full,
+        0);
+
+    square_render_floor(rect, elevation);
+    obj_render_pre_roof(rect, elevation);
+    square_render_roof(rect, elevation);
+    bounds_render(rect, elevation);
+    obj_render_post_roof(rect, elevation);
+    enhance_scene_post_process(buf, buf_full, rect, buf_width, buf_length);
+}
+
+static bool compare_ensure_scratch(int size)
+{
+    if (compare_scratch != NULL && compare_scratch_size >= size) {
+        return true;
+    }
+
+    if (compare_scratch != NULL) {
+        mem_free(compare_scratch);
+    }
+
+    compare_scratch = (unsigned char*)mem_malloc(size);
+    compare_scratch_size = compare_scratch != NULL ? size : 0;
+    return compare_scratch != NULL;
+}
+
 static void refresh_game(Rect* rect, int elevation)
 {
     Rect rectToUpdate;
@@ -601,17 +647,64 @@ static void refresh_game(Rect* rect, int elevation)
         return;
     }
 
-    buf_fill(buf + buf_full * rectToUpdate.uly + rectToUpdate.ulx,
-        rectGetWidth(&rectToUpdate),
-        rectGetHeight(&rectToUpdate),
-        buf_full,
-        0);
+    int mode = enhance_compare_mode();
 
-    square_render_floor(&rectToUpdate, elevation);
-    obj_render_pre_roof(&rectToUpdate, elevation);
-    square_render_roof(&rectToUpdate, elevation);
-    bounds_render(&rectToUpdate, elevation);
-    obj_render_post_roof(&rectToUpdate, elevation);
+    if (mode != ENHANCE_COMPARE_SPLIT) {
+        // OLD renders one fully-vanilla pass; NEW renders one enhanced pass.
+        enhance_set_bypass(mode == ENHANCE_COMPARE_OLD);
+        render_scene(&rectToUpdate, elevation);
+        enhance_set_bypass(false);
+        blit(&rectToUpdate);
+        return;
+    }
+
+    // SPLIT: vanilla left of the seam, enhanced right. The seam is fixed at the
+    // window's horizontal center so it stays put as the map scrolls.
+    int seam = buf_width / 2;
+
+    if (rectToUpdate.ulx >= seam) {
+        // Entirely in the enhanced half.
+        render_scene(&rectToUpdate, elevation);
+    } else if (rectToUpdate.lrx < seam) {
+        // Entirely in the vanilla half.
+        enhance_set_bypass(true);
+        render_scene(&rectToUpdate, elevation);
+        enhance_set_bypass(false);
+    } else {
+        // Straddles the seam: render vanilla, stash the columns left of the
+        // seam, render enhanced over the top, then paste the vanilla columns
+        // back. Both halves come from the same frame, so the split is exact.
+        int leftWidth = seam - rectToUpdate.ulx;
+        int height = rectGetHeight(&rectToUpdate);
+
+        if (compare_ensure_scratch(leftWidth * height)) {
+            enhance_set_bypass(true);
+            render_scene(&rectToUpdate, elevation);
+            for (int row = 0; row < height; row++) {
+                memcpy(compare_scratch + row * leftWidth,
+                    buf + buf_full * (rectToUpdate.uly + row) + rectToUpdate.ulx,
+                    leftWidth);
+            }
+
+            enhance_set_bypass(false);
+            render_scene(&rectToUpdate, elevation);
+            for (int row = 0; row < height; row++) {
+                memcpy(buf + buf_full * (rectToUpdate.uly + row) + rectToUpdate.ulx,
+                    compare_scratch + row * leftWidth,
+                    leftWidth);
+            }
+        } else {
+            // Out of memory for the stash - fall back to an enhanced-only frame.
+            render_scene(&rectToUpdate, elevation);
+        }
+
+        // A one-pixel divider at the seam so the boundary is unmistakable.
+        int white = colorTable[0x7FFF];
+        for (int row = 0; row < height; row++) {
+            buf[buf_full * (rectToUpdate.uly + row) + seam] = white;
+        }
+    }
+
     blit(&rectToUpdate);
 }
 
@@ -1187,7 +1280,7 @@ void square_render_roof(Rect* rect, int elevation)
         minY = square_length - 1;
     }
 
-    int light = light_get_ambient();
+    int light = enhance_render_ambient();
 
     int baseSquareTile = square_width * minY;
 
@@ -1666,16 +1759,13 @@ void floor_draw(int fid, int x, int y, Rect* rect)
     tile = tile_num(savedX, savedY + 13, map_elevation);
     if (tile != -1) {
         int parity = tile & 1;
-        int ambientIntensity = light_get_ambient();
         for (int i = 0; i < 10; i++) {
-            // NOTE: calling light_get_tile two times, probably a result of using __min kind macro
-            int tileIntensity = light_get_tile(elev, tile + verticies[i].offsets[parity]);
-            if (tileIntensity <= ambientIntensity) {
-                tileIntensity = ambientIntensity;
-            }
-
-            verticies[i].intensity = tileIntensity;
+            // CE: render-side light (max with ambient, flicker, weather dim).
+            verticies[i].intensity = enhance_render_light(elev, tile + verticies[i].offsets[parity]);
         }
+
+        // CE: warm/cool tinted intensity table for colored light sources.
+        unsigned char(*lightTable)[256] = enhance_light_table(elev, tile);
 
         int v23 = 0;
         for (int i = 0; i < 9; i++) {
@@ -1688,7 +1778,7 @@ void floor_draw(int fid, int x, int y, Rect* rect)
 
         if (v23 == 9) {
             unsigned char* frame_data = art_frame_data(art, 0, 0);
-            dark_trans_buf_to_buf(frame_data + frameWidth * v78 + v79, v77, v76, frameWidth, buf, x, y, buf_full, verticies[0].intensity);
+            dark_trans_buf_to_buf_lut(frame_data + frameWidth * v78 + v79, v77, v76, frameWidth, buf, x, y, buf_full, verticies[0].intensity, lightTable);
             goto out;
         }
 
@@ -1810,7 +1900,7 @@ void floor_draw(int fid, int x, int y, Rect* rect)
         while (--v76 != -1) {
             for (int kk = 0; kk < v77; kk++) {
                 if (*v67 != 0) {
-                    *v66 = intensityColorTable[*v67][*v68 >> 9];
+                    *v66 = lightTable[*v67][*v68 >> 9];
                 }
                 v67++;
                 v68++;
