@@ -40,6 +40,15 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // Is SurfaceView ready for rendering
     public boolean mIsSurfaceReady;
 
+    private static final int TAP_MOVEMENT_THRESHOLD = 8;
+
+    private boolean mPendingTap;
+    private int mPendingTapDeviceId;
+    private int mPendingTapFingerId;
+    private float mPendingTapX;
+    private float mPendingTapY;
+    private float mPendingTapPressure;
+
     // Startup
     public SDLSurface(Context context) {
         super(context);
@@ -193,6 +202,25 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         return SDLActivity.handleKeyEvent(v, keyCode, event, null);
     }
 
+    private float clampPressure(float pressure) {
+        if (pressure > 1.0f) {
+            return 1.0f;
+        }
+
+        return pressure;
+    }
+
+    private void sendPendingTapAsTouchStart() {
+        SDLActivity.onNativeTouch(mPendingTapDeviceId, mPendingTapFingerId, MotionEvent.ACTION_DOWN,
+            mPendingTapX / mWidth, mPendingTapY / mHeight, mPendingTapPressure);
+        mPendingTap = false;
+    }
+
+    private void sendDirectMouseTap(MotionEvent event) {
+        SDLActivity.onNativeMouse(1, MotionEvent.ACTION_DOWN, event.getX(), event.getY(), false);
+        SDLActivity.onNativeMouse(1, MotionEvent.ACTION_UP, event.getX(), event.getY(), false);
+    }
+
     // Touch events
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -235,6 +263,41 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
             SDLActivity.onNativeMouse(mouseButton, action, x, y, motionListener.inRelativeMode());
         } else {
+            if (mPendingTap) {
+                if (action == MotionEvent.ACTION_UP) {
+                    sendDirectMouseTap(event);
+                    mPendingTap = false;
+                    return true;
+                }
+
+                if (action == MotionEvent.ACTION_CANCEL) {
+                    mPendingTap = false;
+                    return true;
+                }
+
+                if (action == MotionEvent.ACTION_MOVE && pointerCount == 1) {
+                    float dx = event.getX(0) - mPendingTapX;
+                    float dy = event.getY(0) - mPendingTapY;
+                    if (Math.abs(dx) < TAP_MOVEMENT_THRESHOLD && Math.abs(dy) < TAP_MOVEMENT_THRESHOLD) {
+                        return true;
+                    }
+
+                    sendPendingTapAsTouchStart();
+                } else {
+                    sendPendingTapAsTouchStart();
+                }
+            }
+
+            if (action == MotionEvent.ACTION_DOWN && pointerCount == 1) {
+                mPendingTap = true;
+                mPendingTapDeviceId = touchDevId;
+                mPendingTapFingerId = event.getPointerId(0);
+                mPendingTapX = event.getX(0);
+                mPendingTapY = event.getY(0);
+                mPendingTapPressure = clampPressure(event.getPressure(0));
+                return true;
+            }
+
             switch(action) {
                 case MotionEvent.ACTION_MOVE:
                     for (i = 0; i < pointerCount; i++) {
