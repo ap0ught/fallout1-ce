@@ -435,6 +435,7 @@ void mouse_info()
 
         switch (gesture.type) {
         case kTap:
+            mouse_set_position(gesture.x, gesture.y);
             if (gesture.numberOfTouches == 1) {
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
             } else if (gesture.numberOfTouches == 2) {
