@@ -1,0 +1,15 @@
+{
+  "display": { "scale": 1.0 },
+  "input": {
+    "keymap": {
+      "PageButton1": ["1"],
+      "PageButton2": ["2"],
+      "PageButton3": ["3"],
+      "PageButton4": ["4"],
+      "EncoderLeft":    ["up"],
+      "EncoderRight":   ["down"],
+      "Confirm":        ["return"],
+      "Back":           ["backspace"]
+    }
+  }
+}

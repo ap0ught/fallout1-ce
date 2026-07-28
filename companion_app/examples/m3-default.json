@@ -1,0 +1,28 @@
+{
+  "display": {
+    "scale": 1.0,
+    "crtOverlay": true,
+    "vignette": true,
+    "roundedCrt": true
+  },
+  "debug": {
+    "eventLog": false
+  },
+  "input": {
+    "keymap": {
+      "PageButton1": ["1"],
+      "PageButton2": ["2"],
+      "PageButton3": ["3"],
+      "PageButton4": ["4"],
+      "EncoderLeft":    ["up"],
+      "EncoderRight":   ["down"],
+      "Confirm":        ["return"],
+      "Back":           ["backspace"]
+    }
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 28080,
+    "password": "changeme"
+  }
+}

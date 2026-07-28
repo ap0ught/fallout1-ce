@@ -3,6 +3,8 @@
 
 #include "plib/db/db.h"
 
+#include "game/cache.h"
+
 namespace fallout {
 
 typedef enum MapFlags {
@@ -159,6 +161,41 @@ void KillWorldWin();
 int worldmap_script_jump(int city, int a2);
 int xlate_mapidx_to_town(int map_idx);
 int PlayCityMapMusic();
+
+// Returns true while the world map (or the in-world-map town map picker) is
+// the active game surface. Internally backed by `wwin_flag` in
+// `worldmap.cc`, which is set when the world map window is created in
+// `InitWorldMapData` and cleared by `KillWorldWin`. The flag is true for
+// the entire duration of a `world_map()` invocation, including the brief
+// periods the town map picker is shown.
+bool worldMapIsActive();
+
+// Reads the player's current world map position into `*x` and `*y`.
+// Returns true on success, false if either pointer is null. The values
+// are pixel coordinates at the 50-pixel-per-area scale used internally
+// by the world map; clients typically divide by 50 to get the area
+// (hex cell) the player is in. Backed by the file-static `world_xpos`
+// and `world_ypos` in `worldmap.cc`.
+bool worldMapGetPlayerPosition(int* x, int* y);
+
+// Companion world-map image accessor (read-only, color-dumb). Locks the
+// engine's 8-bit palette-indexed world-map art (interface FRM
+// `wmapids[WORLDMAP_FRM_WORLDMAP]`, ~1400px wide) independently of the
+// in-game world-map lifecycle, so it works even if the player has never
+// opened the world map. The accessor uses its own `CacheEntry*` handle
+// (NOT the file-static `wmapidsav[]` handles) so it locks/unlocks
+// cleanly regardless of world-map state.
+//
+// On success returns true and sets `*outPixels` to the frame-0,
+// direction-0 indexed pixel buffer, `*outWidth`/`*outHeight` to the
+// frame dimensions, and `*outHandle` to the lock handle the caller must
+// pass back to `companionUnlockWorldMapImage`. On any failure returns
+// false and locks nothing.
+bool companionLockWorldMapImage(const unsigned char** outPixels, int* outWidth, int* outHeight, CacheEntry** outHandle);
+
+// Releases a handle obtained from `companionLockWorldMapImage`. Safe to
+// call with a null handle.
+void companionUnlockWorldMapImage(CacheEntry* handle);
 
 } // namespace fallout
 

@@ -13,6 +13,7 @@
 #include <limits.h>
 #include <stddef.h>
 
+#include "companion_server.h"
 #include "game/amutex.h"
 #include "game/art.h"
 #include "game/credits.h"
@@ -227,6 +228,13 @@ static bool main_init_system(int argc, char** argv)
         return false;
     }
 
+    // Companion server: must be initialized after game_init (so the
+    // engine's idle_func is set up; the companion server chains its
+    // own idle hook) and before main_selfrun_init (no functional
+    // dependency today, but keeps init order stable across the two
+    // peer subsystems). Init failure is non-fatal by design.
+    companionServerInit();
+
     // NOTE: Uninline.
     main_selfrun_init();
 
@@ -248,6 +256,8 @@ static void main_exit_system()
 
     // NOTE: Uninline.
     main_selfrun_exit();
+
+    companionServerExit();
 
     game_exit();
 

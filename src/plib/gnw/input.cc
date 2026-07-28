@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "audio_engine.h"
+#include "companion_server.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
 #include "plib/gnw/button.h"
@@ -214,6 +215,14 @@ void get_input_position(int* x, int* y)
 void process_bk()
 {
     int v1;
+
+    // Companion server tick. This is the only tick site: every focused
+    // engine loop reaches process_bk() through get_input(), and the
+    // unfocused-window busy-wait reaches it through companionIdleHook
+    // installed in companion_server.cc. Do not move this into
+    // main_game_loop() or any per-loop call site, or coverage of the
+    // focused loops (combat, dialogs, menus, etc.) is lost.
+    companionServerTick(compat_timeGetTime());
 
     GNW_do_bk_process();
 
