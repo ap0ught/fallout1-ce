@@ -193,6 +193,91 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         return SDLActivity.handleKeyEvent(v, keyCode, event, null);
     }
 
+    private boolean isStylusEvent(MotionEvent event) {
+        if ((event.getSource() & InputDevice.SOURCE_STYLUS) == InputDevice.SOURCE_STYLUS) {
+            return true;
+        }
+
+        for (int pointerIndex = 0; pointerIndex < event.getPointerCount(); pointerIndex++) {
+            int toolType = event.getToolType(pointerIndex);
+            if (toolType == MotionEvent.TOOL_TYPE_STYLUS || toolType == MotionEvent.TOOL_TYPE_ERASER) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int getStylusPointerIndex(MotionEvent event) {
+        int action = event.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN
+                || action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_POINTER_DOWN
+                || action == MotionEvent.ACTION_POINTER_UP) {
+            int actionIndex = event.getActionIndex();
+            int toolType = event.getToolType(actionIndex);
+            if (toolType == MotionEvent.TOOL_TYPE_STYLUS || toolType == MotionEvent.TOOL_TYPE_ERASER) {
+                return actionIndex;
+            }
+        }
+
+        for (int pointerIndex = 0; pointerIndex < event.getPointerCount(); pointerIndex++) {
+            int toolType = event.getToolType(pointerIndex);
+            if (toolType == MotionEvent.TOOL_TYPE_STYLUS || toolType == MotionEvent.TOOL_TYPE_ERASER) {
+                return pointerIndex;
+            }
+        }
+
+        return 0;
+    }
+
+    private int getStylusMouseButton(MotionEvent event, int action) {
+        int buttonState = 0;
+        try {
+            Object object = event.getClass().getMethod("getButtonState").invoke(event);
+            if (object != null) {
+                buttonState = (Integer) object;
+            }
+        } catch(Exception ignored) {
+        }
+
+        if (buttonState != 0) {
+            return buttonState;
+        }
+
+        if (action == MotionEvent.ACTION_DOWN
+                || action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_POINTER_DOWN
+                || action == MotionEvent.ACTION_POINTER_UP) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private boolean handleStylusEvent(MotionEvent event) {
+        int action = event.getActionMasked();
+        int pointerIndex = getStylusPointerIndex(event);
+        float x = event.getX(pointerIndex);
+        float y = event.getY(pointerIndex);
+        int effectiveAction = action == MotionEvent.ACTION_CANCEL ? MotionEvent.ACTION_UP : action;
+        int mouseButton = getStylusMouseButton(event, effectiveAction);
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_POINTER_DOWN:
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_HOVER_MOVE:
+                SDLActivity.onNativeMouse(mouseButton, effectiveAction, x, y, false);
+                return true;
+            default:
+                return false;
+        }
+    }
+
     // Touch events
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -234,6 +319,9 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             y = motionListener.getEventY(event);
 
             SDLActivity.onNativeMouse(mouseButton, action, x, y, motionListener.inRelativeMode());
+        } else if (isStylusEvent(event) && handleStylusEvent(event)) {
+            // Stylus input is precise enough to behave like a direct mouse.
+            // Keep finger input on the existing touchpad-emulation path below.
         } else {
             switch(action) {
                 case MotionEvent.ACTION_MOVE:
