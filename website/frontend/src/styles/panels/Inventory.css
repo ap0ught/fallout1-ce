@@ -1,0 +1,127 @@
+.inventory-panel {
+  padding: 1rem;
+}
+
+.inventory-section {
+  margin-bottom: 2rem;
+}
+
+.inventory-section .section-title {
+  font-size: 1.2rem;
+  color: #0ff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(0, 255, 0, 0.3);
+  text-transform: uppercase;
+}
+
+.equipped-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.equipped-item {
+  border: 2px solid var(--text-color);
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(0, 17, 0, 0.3);
+  transition: all 0.2s;
+}
+
+.equipped-item:hover {
+  box-shadow: 0 0 15px var(--glow-color);
+  transform: translateY(-3px);
+}
+
+.item-slot {
+  font-size: 0.8rem;
+  color: #0ff;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.item-name {
+  font-size: 1.1rem;
+  color: #ff0;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.item-pid {
+  font-size: 0.8rem;
+  color: rgba(0, 255, 0, 0.6);
+  margin-top: 0.5rem;
+}
+
+.notable-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notable-item {
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  padding: 1rem;
+  background: rgba(0, 17, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.notable-item:hover {
+  border-color: var(--text-color);
+  background: rgba(0, 17, 0, 0.4);
+  transform: translateX(5px);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.item-header .item-name {
+  color: #ff0;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.item-quantity {
+  color: #0ff;
+  font-weight: bold;
+}
+
+.item-note {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: rgba(0, 255, 0, 0.8);
+  margin: 0.5rem 0;
+}
+
+.inventory-footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  margin-top: 2rem;
+  background: rgba(0, 17, 0, 0.5);
+  border: 2px solid var(--text-color);
+}
+
+.inventory-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inventory-stat .stat-label {
+  font-size: 0.9rem;
+  color: #0ff;
+}
+
+.inventory-stat .stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ff0;
+}

@@ -1,0 +1,47 @@
+{
+  "id": "vault-medic-sarah",
+  "name": "Dr. Sarah Chen",
+  "age": 34,
+  "gender": "Female",
+  "role": "Chief Medical Officer",
+  "vault": "Vault 13",
+  "background": "Dr. Chen has been Vault 13's chief medical officer for 8 years. She's brilliant, dedicated, and deeply concerned about the water crisis affecting her patients. While she supports the Vault Dweller's mission, she worries about the medical supplies they'll need in the wasteland.",
+  "tagline": "First, do no harm - even in the wasteland.",
+  
+  "special": {
+    "strength": 4,
+    "perception": 6,
+    "endurance": 5,
+    "charisma": 6,
+    "intelligence": 9,
+    "agility": 5,
+    "luck": 5
+  },
+  
+  "tagSkills": [
+    "Doctor",
+    "First Aid",
+    "Science"
+  ],
+  
+  "traits": [
+    "Skilled"
+  ],
+  
+  "description": "A compassionate and highly intelligent medical professional. Dr. Chen excels at diagnosis and treatment but has limited combat experience. She believes in the power of science and medicine to heal, even in a post-nuclear world. Her extensive medical knowledge makes her invaluable to Vault 13.",
+  
+  "relationships": [
+    {
+      "name": "Vault Dweller",
+      "relationship": "Patient/Colleague",
+      "description": "Provided medical training and supplies before the mission. Concerned for their safety."
+    },
+    {
+      "name": "Overseer",
+      "relationship": "Advisor",
+      "description": "Advises the Overseer on health matters and the water crisis impact."
+    }
+  ],
+  
+  "notes": "Example of a support/medic build - high Intelligence, medical skills, minimal combat ability"
+}

@@ -1,0 +1,39 @@
+.boot-sequence {
+  padding: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #0f0;
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.boot-line {
+  margin: 0.3rem 0;
+  opacity: 0;
+  animation: bootLine 0.1s ease-in forwards;
+}
+
+.boot-line.progress {
+  color: #0ff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+@keyframes bootLine {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.cursor {
+  display: inline-block;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

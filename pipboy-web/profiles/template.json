@@ -1,0 +1,43 @@
+{
+  "id": "template",
+  "name": "Character Name",
+  "age": 25,
+  "gender": "Male/Female/Other",
+  "role": "Vault Dweller / Guard / Doctor / Scientist / etc.",
+  "vault": "Vault 13",
+  "background": "Character backstory and history...",
+  "tagline": "A short memorable quote or description",
+  
+  "special": {
+    "strength": 5,
+    "perception": 5,
+    "endurance": 5,
+    "charisma": 5,
+    "intelligence": 5,
+    "agility": 5,
+    "luck": 5
+  },
+  
+  "tagSkills": [
+    "Small Guns",
+    "Energy Weapons",
+    "Science"
+  ],
+  
+  "traits": [
+    "Trait Name 1",
+    "Trait Name 2"
+  ],
+  
+  "description": "Detailed character description, personality, motivations, etc.",
+  
+  "relationships": [
+    {
+      "name": "Character Name",
+      "relationship": "Friend/Family/Rival/etc.",
+      "description": "How they know each other"
+    }
+  ],
+  
+  "notes": "Any additional notes or lore about this character"
+}

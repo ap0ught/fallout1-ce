@@ -1,0 +1,144 @@
+.dossier-panel {
+  padding: 1rem;
+}
+
+.dossier-hero {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  padding: 1.5rem;
+  background: rgba(0, 17, 0, 0.5);
+  border: 2px solid var(--text-color);
+  margin-bottom: 2rem;
+}
+
+.dossier-sprite {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border: 2px solid var(--text-color);
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dossier-sprite img {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+
+.sprite-placeholder {
+  color: rgba(0, 255, 0, 0.3);
+}
+
+.dossier-info h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #ff0;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.tagline {
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: #0ff;
+}
+
+.quick-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  padding: 0.5rem 1rem;
+  background: rgba(0, 255, 0, 0.2);
+  border: 1px solid var(--text-color);
+  font-size: 0.9rem;
+}
+
+.highlight-list {
+  list-style: none;
+  padding: 0;
+}
+
+.highlight-list li {
+  padding: 0.5rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid #ff0;
+  margin-bottom: 0.5rem;
+}
+
+.special-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.special-stat {
+  text-align: center;
+  padding: 1rem;
+  border: 2px solid var(--text-color);
+  background: rgba(0, 17, 0, 0.3);
+}
+
+.special-label {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff0;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.special-value {
+  font-size: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.special-name {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #0ff;
+}
+
+.skills-list {
+  margin-top: 1rem;
+}
+
+.skill-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.skill-name {
+  min-width: 150px;
+  flex-shrink: 0;
+}
+
+.skill-bar-container {
+  flex: 1;
+  position: relative;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--text-color);
+}
+
+.skill-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0f0, #0a0);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  transition: width 0.3s ease;
+}
+
+.skill-value {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  text-shadow: 1px 1px 2px #000;
+}

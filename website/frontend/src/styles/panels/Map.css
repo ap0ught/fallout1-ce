@@ -1,0 +1,163 @@
+.map-panel {
+  padding: 1rem;
+}
+
+.map-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.map-display {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  border: 2px solid var(--text-color);
+  background: rgba(0, 17, 0, 0.5);
+  overflow: hidden;
+}
+
+.map-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map-location {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.map-location:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.map-location.visited .location-marker {
+  width: 12px;
+  height: 12px;
+  background: #0f0;
+  border: 2px solid #ff0;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+}
+
+.map-location.unvisited .location-marker {
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 255, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.5);
+}
+
+.location-marker {
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.location-label {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  margin-top: 5px;
+  text-align: center;
+  text-shadow: 1px 1px 3px #000;
+}
+
+.map-location.unvisited .location-label {
+  color: rgba(0, 255, 0, 0.5);
+}
+
+.route-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.route-line {
+  stroke: #ff0;
+  stroke-width: 2;
+  stroke-dasharray: 5, 5;
+  opacity: 0.7;
+}
+
+.map-location-info {
+  padding: 1rem;
+  border: 2px solid var(--text-color);
+  background: rgba(0, 17, 0, 0.7);
+  min-height: 120px;
+}
+
+.map-location-info h3 {
+  color: #ff0;
+  margin-bottom: 0.5rem;
+}
+
+.location-type {
+  font-size: 0.9rem;
+  color: #0ff;
+  margin-bottom: 0.5rem;
+}
+
+.location-summary {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.location-first-visit {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: rgba(0, 255, 0, 0.8);
+  margin-top: 0.5rem;
+}
+
+.map-legend {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  background: rgba(0, 17, 0, 0.3);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.legend-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-marker.visited {
+  background: #0f0;
+  border: 2px solid #ff0;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+}
+
+.legend-marker.unvisited {
+  background: rgba(0, 255, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.5);
+}
+
+.legend-line {
+  width: 30px;
+  height: 2px;
+  background: #ff0;
+  opacity: 0.7;
+}
+
+.map-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  background: rgba(0, 17, 0, 0.3);
+}
+
+.map-stats div {
+  text-align: center;
+}

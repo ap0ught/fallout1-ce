@@ -1,0 +1,55 @@
+name: Fallout Wiki Scraper
+
+on:
+  schedule:
+    # Run weekly on Mondays at 00:00 UTC to keep cache fresh
+    - cron: '0 0 * * 1'
+  workflow_dispatch:  # Allow manual triggering
+  push:
+    paths:
+      - 'website/backend/fallout_wiki_scraper.py'
+      - 'website/backend/quest_database.py'
+      - '.github/workflows/wiki-scraper.yml'
+
+jobs:
+  scrape-wiki:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          cd website/backend
+          pip install -r requirements.txt
+      
+      - name: Scrape Fallout Wiki
+        run: |
+          cd website/backend
+          python fallout_wiki_scraper.py --fetch-all
+      
+      - name: Show cache statistics
+        run: |
+          cd website/backend
+          python fallout_wiki_scraper.py --stats
+      
+      - name: Upload wiki cache as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fallout-wiki-cache
+          path: website/backend/wiki_cache/
+          retention-days: 30
+      
+      - name: Commit and push cache (optional)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add website/backend/wiki_cache/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update Fallout wiki cache [skip ci]" && git push)

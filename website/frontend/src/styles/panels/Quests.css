@@ -1,0 +1,137 @@
+.quests-panel {
+  padding: 1rem;
+}
+
+.quest-summary {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(0, 17, 0, 0.5);
+  border: 2px solid var(--text-color);
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #0ff;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff0;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.quest-section {
+  margin-bottom: 2rem;
+}
+
+.quest-section .section-title {
+  font-size: 1.2rem;
+  color: #0ff;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(0, 255, 0, 0.3);
+}
+
+.quest-card {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 2px solid rgba(0, 255, 0, 0.3);
+  background: rgba(0, 17, 0, 0.3);
+  transition: all 0.2s;
+}
+
+.quest-card:hover {
+  border-color: var(--text-color);
+  box-shadow: 0 0 15px var(--glow-color);
+  transform: translateX(3px);
+}
+
+.quest-card.highlight {
+  border-color: #ff0;
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+}
+
+.quest-card.quest-status-active {
+  border-left-width: 4px;
+  border-left-color: #0ff;
+}
+
+.quest-card.quest-status-completed {
+  border-left-width: 4px;
+  border-left-color: #0f0;
+}
+
+.quest-card.quest-status-failed {
+  border-left-width: 4px;
+  border-left-color: #f00;
+}
+
+.quest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.quest-header h4 {
+  font-size: 1.1rem;
+  color: #ff0;
+}
+
+.quest-status {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  border: 1px solid;
+  font-weight: bold;
+}
+
+.quest-status.active {
+  border-color: #0ff;
+  color: #0ff;
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.quest-status.completed {
+  border-color: #0f0;
+  color: #0f0;
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.quest-status.failed {
+  border-color: #f00;
+  color: #f00;
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.quest-description {
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+
+.quest-outcome {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(0, 255, 0, 0.1);
+  border-left: 3px solid #0f0;
+  font-style: italic;
+}
+
+.quest-locations {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: rgba(0, 255, 0, 0.8);
+}
+
+.quest-locations strong {
+  color: #0ff;
+}

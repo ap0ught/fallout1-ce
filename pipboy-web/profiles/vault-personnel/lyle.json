@@ -1,0 +1,47 @@
+{
+  "id": "lyle",
+  "name": "Lyle",
+  "age": 32,
+  "gender": "Male",
+  "role": "Weapons Merchant",
+  "vault": "Vault 13",
+  "background": "Lyle manages Vault 13's armory and provides basic weapons training. He's practical, gruff, and believes everyone should know how to defend themselves - even in the 'safe' vault environment.",
+  "tagline": "A gun's only as good as the person holding it.",
+  
+  "special": {
+    "strength": 6,
+    "perception": 7,
+    "endurance": 6,
+    "charisma": 5,
+    "intelligence": 5,
+    "agility": 6,
+    "luck": 5
+  },
+  
+  "tagSkills": [
+    "Small Guns",
+    "Repair",
+    "First Aid"
+  ],
+  
+  "traits": [
+    "Fast Shot"
+  ],
+  
+  "description": "A no-nonsense weapons expert who takes his job seriously. While he rarely shows emotion, Lyle genuinely cares about the vault's safety and wants to ensure everyone is prepared for the worst. He equipped the Vault Dweller with their first weapon.",
+  
+  "relationships": [
+    {
+      "name": "Vault Dweller",
+      "relationship": "Friend",
+      "description": "Childhood friend. Gave them their first 10mm pistol and some basic training."
+    },
+    {
+      "name": "Overseer",
+      "relationship": "Colleague",
+      "description": "Works under the Overseer's direction to maintain vault security."
+    }
+  ],
+  
+  "notes": "Pre-defined Vault personnel - weapons merchant and armory manager"
+}

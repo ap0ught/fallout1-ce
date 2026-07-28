@@ -1,0 +1,48 @@
+{
+  "id": "wasteland-explorer",
+  "name": "Marcus Stone",
+  "age": 31,
+  "gender": "Male",
+  "role": "Wasteland Explorer",
+  "vault": "Vault 13",
+  "background": "Marcus always dreamed of seeing what lay beyond Vault 13's doors. As a child, he'd spend hours studying old pre-war maps and listening to stories from the oldest vault dwellers. When not on duty, he trains relentlessly in survival skills, waiting for his chance to explore.",
+  "tagline": "The wasteland calls, and I must answer.",
+  
+  "special": {
+    "strength": 6,
+    "perception": 8,
+    "endurance": 7,
+    "charisma": 5,
+    "intelligence": 5,
+    "agility": 8,
+    "luck": 3
+  },
+  
+  "tagSkills": [
+    "Outdoorsman",
+    "Small Guns",
+    "Sneak"
+  ],
+  
+  "traits": [
+    "Kamikaze",
+    "Small Frame"
+  ],
+  
+  "description": "A natural survivalist with exceptional perception and agility. Marcus is built for exploration and evasion rather than direct confrontation. His knowledge of the outdoors and stealth abilities make him perfect for scouting dangerous territory. However, his reckless nature and fragility mean he needs to be careful in combat.",
+  
+  "relationships": [
+    {
+      "name": "Lyle",
+      "relationship": "Mentor",
+      "description": "Taught Marcus basic weapons handling and survival combat."
+    },
+    {
+      "name": "Overseer",
+      "relationship": "Authority",
+      "description": "Wishes he had been chosen for the water chip mission instead."
+    }
+  ],
+  
+  "notes": "Custom character - Agility/Perception focused explorer build with Kamikaze trait for extra sequence"
+}

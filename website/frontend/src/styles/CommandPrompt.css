@@ -1,0 +1,38 @@
+.command-prompt {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  flex-shrink: 0;
+}
+
+.prompt-text {
+  color: #ff0;
+  text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.command-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  text-shadow: inherit;
+  caret-color: transparent;
+  min-width: 0;
+}
+
+.cursor-blink {
+  display: inline-block;
+  margin-left: 2px;
+  animation: cursorBlink 1s step-end infinite;
+  color: inherit;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

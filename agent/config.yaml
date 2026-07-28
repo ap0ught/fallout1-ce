@@ -1,0 +1,132 @@
+# Fallout 1 AI Agent Configuration
+
+# Context Settings
+contexts:
+  # Game State: Always enabled - core game information
+  game_state: true
+  
+  # Canon Context: Lore, NPC knowledge, world information
+  # Disable for a "blind" playthrough where AI discovers lore
+  canon: true
+  
+  # Strategy Context: Optimization hints, warnings, optimal paths
+  # Disable for harder, more immersive gameplay without metagaming
+  strategy: false
+
+# LLM Backend Configuration
+llm:
+  # Provider: "openai", "anthropic", "local", "ollama"
+  provider: "openai"
+  
+  # Model name
+  model: "gpt-4"
+  
+  # Temperature (0.0 = deterministic, 1.0 = creative)
+  temperature: 0.7
+  
+  # Max tokens per response
+  max_tokens: 500
+  
+  # API key (or set OPENAI_API_KEY environment variable)
+  api_key: ""
+
+# Decision Making Parameters
+decision_making:
+  # Risk tolerance: "low", "medium", "high"
+  # Low: Avoid danger, prioritize survival
+  # Medium: Balanced approach
+  # High: Aggressive, takes risks for rewards
+  risk_tolerance: "medium"
+  
+  # Exploration bonus (0.0 - 1.0)
+  # Higher values encourage exploring new areas
+  exploration_bonus: 0.2
+  
+  # Combat aggression: "defensive", "balanced", "aggressive"
+  # Defensive: Avoid fights, flee when possible
+  # Balanced: Fight when necessary
+  # Aggressive: Seek out combat opportunities
+  combat_aggression: "balanced"
+  
+  # Roleplay strictness (0.0 - 1.0)
+  # Higher values enforce stricter character consistency
+  roleplay_strictness: 0.8
+
+# Character Personality (used for roleplay)
+character:
+  # Personality traits that influence decisions
+  traits:
+    - "Cautious survivor"
+    - "Loyal to Vault 13"
+    - "Resourceful problem solver"
+    - "Suspicious of strangers"
+  
+  # Moral alignment
+  alignment: "neutral_good"
+  
+  # Speaking style
+  speaking_style: "Brief, wasteland-practical, occasionally sarcastic"
+
+# File Paths (relative to game directory)
+files:
+  # Input: Game writes these
+  game_state: "ai_state.json"
+  memory: "ai_memory.json"
+  knowledge: "ai_knowledge.json"
+  character_data: "character_data.json"
+  
+  # Output: Agent writes this
+  action: "ai_action.json"
+  
+  # Agent data files
+  locations_db: "agent/data/locations.json"
+  npcs_db: "agent/data/npcs.json"
+  quests_db: "agent/data/quests.json"
+  strategies_db: "agent/data/strategies.json"
+
+# Logging
+logging:
+  # Log level: "DEBUG", "INFO", "WARNING", "ERROR"
+  level: "INFO"
+  
+  # Log file path
+  file: "agent/logs/agent.log"
+  
+  # Log decisions and reasoning
+  log_decisions: true
+  
+  # Log full prompts sent to LLM
+  log_prompts: false
+
+# Performance
+performance:
+  # Action delay (seconds between actions)
+  action_delay: 1.0
+  
+  # Max actions per second (rate limiting)
+  max_actions_per_second: 1
+  
+  # Cache context data to reduce processing
+  cache_contexts: true
+
+# Twitch Integration (optional)
+twitch:
+  enabled: false
+  channel: ""
+  
+  # Allow chat voting on decisions
+  chat_voting: false
+  
+  # Vote duration (seconds)
+  vote_duration: 30
+
+# Safety Settings
+safety:
+  # Require confirmation for dangerous actions
+  confirm_dangerous_actions: false
+  
+  # Auto-save before risky decisions
+  auto_save: true
+  
+  # Maximum HP loss per action before forcing heal
+  max_hp_loss_threshold: 20

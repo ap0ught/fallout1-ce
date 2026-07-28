@@ -391,3 +391,9 @@ FodyWeavers.xsd
 # CMake
 /out
 /build
+website/frontend/node_modules/
+website/frontend/dist/
+
+# Wiki cache (optional - can be committed or kept local)
+# Uncomment the next line to exclude wiki cache from commits
+# website/backend/wiki_cache/

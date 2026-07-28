@@ -1,0 +1,244 @@
+{
+  "category": "Fallout_weapons",
+  "pages": [
+    {
+      "pageid": 4595,
+      "ns": 0,
+      "title": "Fallout weapons",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-05-17T21:41:37Z",
+      "lastrevid": 4667773,
+      "length": 47472,
+      "fullurl": "https://fallout.fandom.com/wiki/Fallout_weapons",
+      "editurl": "https://fallout.fandom.com/wiki/Fallout_weapons?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Fallout_weapons"
+    },
+    {
+      "pageid": 55816,
+      "ns": 0,
+      "title": "Dynamite (Fallout)",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:34:03Z",
+      "lastrevid": 4528764,
+      "length": 2865,
+      "fullurl": "https://fallout.fandom.com/wiki/Dynamite_(Fallout)",
+      "editurl": "https://fallout.fandom.com/wiki/Dynamite_(Fallout)?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Dynamite_(Fallout)"
+    },
+    {
+      "pageid": 67888,
+      "ns": 0,
+      "title": "Plastic explosives (Fallout)",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:34:23Z",
+      "lastrevid": 4528766,
+      "length": 2271,
+      "fullurl": "https://fallout.fandom.com/wiki/Plastic_explosives_(Fallout)",
+      "editurl": "https://fallout.fandom.com/wiki/Plastic_explosives_(Fallout)?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Plastic_explosives_(Fallout)"
+    },
+    {
+      "pageid": 133723,
+      "ns": 14,
+      "title": "Category:Fallout weapons by skill",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Weapons by game and skill"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-01-19T19:20:31Z",
+      "lastrevid": 4406124,
+      "length": 228,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapons_by_skill",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapons_by_skill?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapons_by_skill"
+    },
+    {
+      "pageid": 50510,
+      "ns": 14,
+      "title": "Category:Fallout cut weapons",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Cut weapons"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout cut items"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2024-10-04T18:18:44Z",
+      "lastrevid": 4372490,
+      "length": 221,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_cut_weapons",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_cut_weapons?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_cut_weapons"
+    },
+    {
+      "pageid": 10629,
+      "ns": 14,
+      "title": "Category:Fallout weapon images",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout item images"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Weapon images"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-03-13T23:49:29Z",
+      "lastrevid": 4375230,
+      "length": 274,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapon_images",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapon_images?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapon_images"
+    },
+    {
+      "pageid": 205471,
+      "ns": 14,
+      "title": "Category:Fallout weapon sounds",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout audio files"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Weapon sounds"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2021-11-22T16:54:59Z",
+      "lastrevid": 3655888,
+      "length": 112,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapon_sounds",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapon_sounds?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_weapon_sounds"
+    },
+    {
+      "pageid": 314835,
+      "ns": 14,
+      "title": "Category:Fallout thrown explosives",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout 2 weapons"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2021-11-21T18:57:30Z",
+      "lastrevid": 3655754,
+      "length": 73,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_thrown_explosives",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_thrown_explosives?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_thrown_explosives"
+    },
+    {
+      "pageid": 335670,
+      "ns": 14,
+      "title": "Category:Fallout unique weapons",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout unique items"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout weapons"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Unique weapons by game"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-01-24T18:28:51Z",
+      "lastrevid": 4408601,
+      "length": 303,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_unique_weapons",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_unique_weapons?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_unique_weapons"
+    }
+  ],
+  "count": 9
+}

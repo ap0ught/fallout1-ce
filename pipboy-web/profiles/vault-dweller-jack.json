@@ -1,0 +1,48 @@
+{
+  "id": "vault-dweller-jack",
+  "name": "Jack Morrison",
+  "age": 28,
+  "gender": "Male",
+  "role": "Vault Dweller",
+  "vault": "Vault 13",
+  "background": "Born and raised in Vault 13, Jack was chosen by the Overseer to venture into the wasteland to find a replacement water chip. Despite his technical expertise, he never imagined he'd be the one to face the dangers of the outside world.",
+  "tagline": "The fate of Vault 13 rests on my shoulders.",
+  
+  "special": {
+    "strength": 5,
+    "perception": 7,
+    "endurance": 6,
+    "charisma": 4,
+    "intelligence": 8,
+    "agility": 7,
+    "luck": 5
+  },
+  
+  "tagSkills": [
+    "Small Guns",
+    "Science",
+    "Speech"
+  ],
+  
+  "traits": [
+    "Gifted",
+    "Fast Shot"
+  ],
+  
+  "description": "Jack is a pragmatic problem-solver who excels at technical challenges. While not naturally charismatic, his intelligence and determination have seen him through countless dangerous situations. He takes his responsibility to Vault 13 seriously, but the wasteland is changing him in ways he never expected.",
+  
+  "relationships": [
+    {
+      "name": "The Overseer",
+      "relationship": "Authority Figure",
+      "description": "Selected Jack for the water chip mission. Trusts his abilities but worries about his inexperience."
+    },
+    {
+      "name": "Lyle",
+      "relationship": "Friend",
+      "description": "Vault weapons merchant who equipped Jack for the journey. Childhood friend."
+    }
+  ],
+  
+  "notes": "This is the default Vault Dweller build - balanced for technical problem-solving and combat."
+}

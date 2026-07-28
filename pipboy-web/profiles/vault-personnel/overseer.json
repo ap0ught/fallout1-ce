@@ -1,0 +1,42 @@
+{
+  "id": "overseer",
+  "name": "Jacoren",
+  "age": 68,
+  "gender": "Male",
+  "role": "Overseer of Vault 13",
+  "vault": "Vault 13",
+  "background": "Jacoren has led Vault 13 for over 30 years with wisdom and determination. When the water chip failed, he made the difficult decision to send someone into the wasteland - a world he swore to protect his people from.",
+  "tagline": "The safety of the vault is my only concern.",
+  
+  "special": {
+    "strength": 4,
+    "perception": 6,
+    "endurance": 5,
+    "charisma": 8,
+    "intelligence": 7,
+    "agility": 3,
+    "luck": 6
+  },
+  
+  "tagSkills": [
+    "Speech",
+    "Barter",
+    "Science"
+  ],
+  
+  "traits": [
+    "Skilled"
+  ],
+  
+  "description": "A natural leader with decades of experience managing Vault 13's population and resources. Jacoren is wise but conservative, preferring isolation over the unknown dangers of the wasteland. His decision to send the Vault Dweller outside weighs heavily on his conscience.",
+  
+  "relationships": [
+    {
+      "name": "Vault Dweller",
+      "relationship": "Subordinate",
+      "description": "Hand-picked for the water chip mission. Represents both hope and risk."
+    }
+  ],
+  
+  "notes": "Pre-defined Vault personnel - the leader of Vault 13"
+}

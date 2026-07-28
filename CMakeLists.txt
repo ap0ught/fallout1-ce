@@ -43,6 +43,8 @@ target_include_directories(${EXECUTABLE_NAME} PUBLIC src)
 target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/game/actions.cc"
     "src/game/actions.h"
+    "src/game/ai_control_api.cc"
+    "src/game/ai_control_api.h"
     "src/game/amutex.cc"
     "src/game/amutex.h"
     "src/game/anim.cc"

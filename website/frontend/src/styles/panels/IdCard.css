@@ -1,0 +1,151 @@
+.id-card-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+.id-card {
+  width: 100%;
+  max-width: 600px;
+  border: 3px solid var(--text-color);
+  background: rgba(0, 17, 0, 0.9);
+  padding: 1.5rem;
+  box-shadow: 0 0 20px var(--glow-color), inset 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.id-card-header {
+  text-align: center;
+  border-bottom: 2px solid var(--text-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.vault-tec-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 4px;
+  color: #ff0;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+}
+
+.id-card-title {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.id-serial {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  color: #0ff;
+}
+
+.id-card-body {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.id-photo-section {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.id-portrait,
+.id-sprite {
+  border: 2px solid var(--text-color);
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.id-portrait {
+  width: 150px;
+  height: 180px;
+}
+
+.id-sprite {
+  width: 100px;
+  height: 100px;
+}
+
+.id-portrait img,
+.id-sprite img {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+
+.id-portrait-placeholder,
+.id-sprite-placeholder {
+  color: rgba(0, 255, 0, 0.3);
+}
+
+.id-info-section,
+.id-status-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.id-field {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.id-label {
+  font-weight: bold;
+  min-width: 120px;
+  color: #0ff;
+}
+
+.id-value {
+  flex: 1;
+}
+
+.id-value.karma {
+  color: #ff0;
+  text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.reputation-list {
+  flex: 1;
+}
+
+.reputation-item {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.id-card-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--text-color);
+  text-align: center;
+}
+
+.id-barcode {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.id-disclaimer {
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.id-stamp {
+  display: inline-block;
+  padding: 0.25rem 1rem;
+  border: 2px solid #ff0;
+  color: #ff0;
+  font-weight: bold;
+  transform: rotate(-5deg);
+  margin-top: 0.5rem;
+}

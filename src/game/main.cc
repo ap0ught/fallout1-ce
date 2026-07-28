@@ -13,6 +13,7 @@
 #include <limits.h>
 #include <stddef.h>
 
+#include "game/ai_control_api.h"
 #include "game/amutex.h"
 #include "game/art.h"
 #include "game/credits.h"
@@ -230,6 +231,8 @@ static bool main_init_system(int argc, char** argv)
     // NOTE: Uninline.
     main_selfrun_init();
 
+    ai_control_api_init();
+
     return true;
 }
 
@@ -248,6 +251,8 @@ static void main_exit_system()
 
     // NOTE: Uninline.
     main_selfrun_exit();
+
+    ai_control_api_exit();
 
     game_exit();
 
@@ -321,6 +326,9 @@ static void main_game_loop()
 
     while (game_user_wants_to_quit == 0) {
         sharedFpsLimiter.mark();
+
+        // Process AI control API if enabled
+        ai_control_api_process();
 
         int keyCode = get_input();
         game_handle_input(keyCode, false);

@@ -1,0 +1,1254 @@
+{
+  "category": "Fallout_quests",
+  "pages": [
+    {
+      "pageid": 3673,
+      "ns": 0,
+      "title": "Fallout quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:25Z",
+      "lastrevid": 4571116,
+      "length": 14950,
+      "fullurl": "https://fallout.fandom.com/wiki/Fallout_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Fallout_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Fallout_quests"
+    },
+    {
+      "pageid": 703722,
+      "ns": 116,
+      "title": "Resources:The Nearly Ultimate Fallout Guide",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Resources"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Walkthroughs"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-08-11T18:55:25Z",
+      "lastrevid": 3971092,
+      "length": 260450,
+      "fullurl": "https://fallout.fandom.com/wiki/Resources:The_Nearly_Ultimate_Fallout_Guide",
+      "editurl": "https://fallout.fandom.com/wiki/Resources:The_Nearly_Ultimate_Fallout_Guide?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Resources:The_Nearly_Ultimate_Fallout_Guide"
+    },
+    {
+      "pageid": 155722,
+      "ns": 0,
+      "title": "Ask Water Merchant to help",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:19Z",
+      "lastrevid": 4530364,
+      "length": 2715,
+      "fullurl": "https://fallout.fandom.com/wiki/Ask_Water_Merchant_to_help",
+      "editurl": "https://fallout.fandom.com/wiki/Ask_Water_Merchant_to_help?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Ask_Water_Merchant_to_help"
+    },
+    {
+      "pageid": 7419,
+      "ns": 0,
+      "title": "Blackmail Iguana Bob",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:47Z",
+      "lastrevid": 4553403,
+      "length": 3770,
+      "fullurl": "https://fallout.fandom.com/wiki/Blackmail_Iguana_Bob",
+      "editurl": "https://fallout.fandom.com/wiki/Blackmail_Iguana_Bob?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Blackmail_Iguana_Bob"
+    },
+    {
+      "pageid": 2517,
+      "ns": 0,
+      "title": "Bust the Skulz gang",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:08Z",
+      "lastrevid": 4553417,
+      "length": 4446,
+      "fullurl": "https://fallout.fandom.com/wiki/Bust_the_Skulz_gang",
+      "editurl": "https://fallout.fandom.com/wiki/Bust_the_Skulz_gang?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Bust_the_Skulz_gang"
+    },
+    {
+      "pageid": 4545,
+      "ns": 0,
+      "title": "Calm rebel faction",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Vault 13 quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:40Z",
+      "lastrevid": 4530341,
+      "length": 2756,
+      "fullurl": "https://fallout.fandom.com/wiki/Calm_rebel_faction",
+      "editurl": "https://fallout.fandom.com/wiki/Calm_rebel_faction?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Calm_rebel_faction"
+    },
+    {
+      "pageid": 21093,
+      "ns": 0,
+      "title": "Destroy the Mutant leader",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Cathedral"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Vault 13 quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:32:21Z",
+      "lastrevid": 4533021,
+      "length": 12225,
+      "fullurl": "https://fallout.fandom.com/wiki/Destroy_the_Mutant_leader",
+      "editurl": "https://fallout.fandom.com/wiki/Destroy_the_Mutant_leader?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Destroy_the_Mutant_leader"
+    },
+    {
+      "pageid": 6709,
+      "ns": 0,
+      "title": "Destroy the source of the Mutants",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Articles with verified bugs"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Mariposa Military Base"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Vault 13 quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:42Z",
+      "lastrevid": 4531918,
+      "length": 10229,
+      "fullurl": "https://fallout.fandom.com/wiki/Destroy_the_source_of_the_Mutants",
+      "editurl": "https://fallout.fandom.com/wiki/Destroy_the_source_of_the_Mutants?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Destroy_the_source_of_the_Mutants"
+    },
+    {
+      "pageid": 6707,
+      "ns": 0,
+      "title": "Destroy the Super Mutants at the Watershed",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Necropolis"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:41Z",
+      "lastrevid": 4633131,
+      "length": 6030,
+      "fullurl": "https://fallout.fandom.com/wiki/Destroy_the_Super_Mutants_at_the_Watershed",
+      "editurl": "https://fallout.fandom.com/wiki/Destroy_the_Super_Mutants_at_the_Watershed?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Destroy_the_Super_Mutants_at_the_Watershed"
+    },
+    {
+      "pageid": 2548,
+      "ns": 0,
+      "title": "Dispose of Jain",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:09Z",
+      "lastrevid": 4529763,
+      "length": 3022,
+      "fullurl": "https://fallout.fandom.com/wiki/Dispose_of_Jain",
+      "editurl": "https://fallout.fandom.com/wiki/Dispose_of_Jain?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Dispose_of_Jain"
+    },
+    {
+      "pageid": 2547,
+      "ns": 0,
+      "title": "Dispose of merchant",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:09Z",
+      "lastrevid": 4530299,
+      "length": 7236,
+      "fullurl": "https://fallout.fandom.com/wiki/Dispose_of_merchant",
+      "editurl": "https://fallout.fandom.com/wiki/Dispose_of_merchant?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Dispose_of_merchant"
+    },
+    {
+      "pageid": 512046,
+      "ns": 116,
+      "title": "Resources:Fallout walkthrough",
+      "extract": "This article contains information on how to progress through the main plot of Fallout. For a list of all the side quests, see Fallout quests.",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:35:54Z",
+      "lastrevid": 4545435,
+      "length": 6109,
+      "fullurl": "https://fallout.fandom.com/wiki/Resources:Fallout_walkthrough",
+      "editurl": "https://fallout.fandom.com/wiki/Resources:Fallout_walkthrough?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Resources:Fallout_walkthrough"
+    },
+    {
+      "pageid": 2536,
+      "ns": 0,
+      "title": "Find the missing caravans",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Articles with verified bugs"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:09Z",
+      "lastrevid": 4616168,
+      "length": 5616,
+      "fullurl": "https://fallout.fandom.com/wiki/Find_the_missing_caravans",
+      "editurl": "https://fallout.fandom.com/wiki/Find_the_missing_caravans?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Find_the_missing_caravans"
+    },
+    {
+      "pageid": 4546,
+      "ns": 0,
+      "title": "Find the Water Chip",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Articles with verified bugs"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Vault 13 quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:40Z",
+      "lastrevid": 4531689,
+      "length": 9993,
+      "fullurl": "https://fallout.fandom.com/wiki/Find_the_Water_Chip",
+      "editurl": "https://fallout.fandom.com/wiki/Find_the_Water_Chip?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Find_the_Water_Chip"
+    },
+    {
+      "pageid": 4547,
+      "ns": 0,
+      "title": "Find the Water Thief",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Vault 13 quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:39Z",
+      "lastrevid": 4633118,
+      "length": 4649,
+      "fullurl": "https://fallout.fandom.com/wiki/Find_the_Water_Thief",
+      "editurl": "https://fallout.fandom.com/wiki/Find_the_Water_Thief?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Find_the_Water_Thief"
+    },
+    {
+      "pageid": 2600,
+      "ns": 0,
+      "title": "Fix the hydroponic farms in Adytum",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Boneyard quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Bug verification overdue"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:09Z",
+      "lastrevid": 4576799,
+      "length": 3746,
+      "fullurl": "https://fallout.fandom.com/wiki/Fix_the_hydroponic_farms_in_Adytum",
+      "editurl": "https://fallout.fandom.com/wiki/Fix_the_hydroponic_farms_in_Adytum?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Fix_the_hydroponic_farms_in_Adytum"
+    },
+    {
+      "pageid": 3937,
+      "ns": 0,
+      "title": "Fix the Necropolis water pump",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Necropolis"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:27Z",
+      "lastrevid": 4530337,
+      "length": 4174,
+      "fullurl": "https://fallout.fandom.com/wiki/Fix_the_Necropolis_water_pump",
+      "editurl": "https://fallout.fandom.com/wiki/Fix_the_Necropolis_water_pump?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Fix_the_Necropolis_water_pump"
+    },
+    {
+      "pageid": 1829,
+      "ns": 0,
+      "title": "Get Gizmo's confession",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:29:58Z",
+      "lastrevid": 4499599,
+      "length": 5213,
+      "fullurl": "https://fallout.fandom.com/wiki/Get_Gizmo%27s_confession",
+      "editurl": "https://fallout.fandom.com/wiki/Get_Gizmo%27s_confession?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Get_Gizmo%27s_confession"
+    },
+    {
+      "pageid": 28447,
+      "ns": 0,
+      "title": "Guard the caravans",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:33:10Z",
+      "lastrevid": 4364981,
+      "length": 3985,
+      "fullurl": "https://fallout.fandom.com/wiki/Guard_the_caravans",
+      "editurl": "https://fallout.fandom.com/wiki/Guard_the_caravans?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Guard_the_caravans"
+    },
+    {
+      "pageid": 2532,
+      "ns": 0,
+      "title": "Help Irwin",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:09Z",
+      "lastrevid": 4528762,
+      "length": 3260,
+      "fullurl": "https://fallout.fandom.com/wiki/Help_Irwin",
+      "editurl": "https://fallout.fandom.com/wiki/Help_Irwin?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Help_Irwin"
+    },
+    {
+      "pageid": 7394,
+      "ns": 0,
+      "title": "Join the Khans",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Khan Base quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:45Z",
+      "lastrevid": 4499600,
+      "length": 2543,
+      "fullurl": "https://fallout.fandom.com/wiki/Join_the_Khans",
+      "editurl": "https://fallout.fandom.com/wiki/Join_the_Khans?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Join_the_Khans"
+    },
+    {
+      "pageid": 6712,
+      "ns": 0,
+      "title": "Kill Killian",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:42Z",
+      "lastrevid": 4499601,
+      "length": 3803,
+      "fullurl": "https://fallout.fandom.com/wiki/Kill_Killian",
+      "editurl": "https://fallout.fandom.com/wiki/Kill_Killian?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Kill_Killian"
+    },
+    {
+      "pageid": 7398,
+      "ns": 0,
+      "title": "Kill Neal",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:45Z",
+      "lastrevid": 4373468,
+      "length": 4136,
+      "fullurl": "https://fallout.fandom.com/wiki/Kill_Neal",
+      "editurl": "https://fallout.fandom.com/wiki/Kill_Neal?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Kill_Neal"
+    },
+    {
+      "pageid": 560989,
+      "ns": 0,
+      "title": "Receive training from Thomas",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:37:01Z",
+      "lastrevid": 4499602,
+      "length": 2833,
+      "fullurl": "https://fallout.fandom.com/wiki/Receive_training_from_Thomas",
+      "editurl": "https://fallout.fandom.com/wiki/Receive_training_from_Thomas?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Receive_training_from_Thomas"
+    },
+    {
+      "pageid": 1521,
+      "ns": 0,
+      "title": "Rescue Sinthia",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:29:55Z",
+      "lastrevid": 4376625,
+      "length": 4088,
+      "fullurl": "https://fallout.fandom.com/wiki/Rescue_Sinthia",
+      "editurl": "https://fallout.fandom.com/wiki/Rescue_Sinthia?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Rescue_Sinthia"
+    },
+    {
+      "pageid": 6710,
+      "ns": 0,
+      "title": "Rescue Tandi from the Raiders",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Articles with verified bugs"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Bug verification overdue"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Khan Base quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Shady Sands quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:42Z",
+      "lastrevid": 4499603,
+      "length": 7790,
+      "fullurl": "https://fallout.fandom.com/wiki/Rescue_Tandi_from_the_Raiders",
+      "editurl": "https://fallout.fandom.com/wiki/Rescue_Tandi_from_the_Raiders?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Rescue_Tandi_from_the_Raiders"
+    },
+    {
+      "pageid": 7393,
+      "ns": 0,
+      "title": "Solve Phil's Canine Conundrum",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:45Z",
+      "lastrevid": 3871311,
+      "length": 3463,
+      "fullurl": "https://fallout.fandom.com/wiki/Solve_Phil%27s_Canine_Conundrum",
+      "editurl": "https://fallout.fandom.com/wiki/Solve_Phil%27s_Canine_Conundrum?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Solve_Phil%27s_Canine_Conundrum"
+    },
+    {
+      "pageid": 7396,
+      "ns": 0,
+      "title": "Steal Neal's Urn",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:45Z",
+      "lastrevid": 4376601,
+      "length": 3310,
+      "fullurl": "https://fallout.fandom.com/wiki/Steal_Neal%27s_Urn",
+      "editurl": "https://fallout.fandom.com/wiki/Steal_Neal%27s_Urn?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Steal_Neal%27s_Urn"
+    },
+    {
+      "pageid": 6713,
+      "ns": 0,
+      "title": "Steal necklace from the Merchants",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:42Z",
+      "lastrevid": 4531558,
+      "length": 4496,
+      "fullurl": "https://fallout.fandom.com/wiki/Steal_necklace_from_the_Merchants",
+      "editurl": "https://fallout.fandom.com/wiki/Steal_necklace_from_the_Merchants?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Steal_necklace_from_the_Merchants"
+    },
+    {
+      "pageid": 7391,
+      "ns": 0,
+      "title": "Stop Gizmo",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Articles with verified bugs"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:30:45Z",
+      "lastrevid": 4529447,
+      "length": 3109,
+      "fullurl": "https://fallout.fandom.com/wiki/Stop_Gizmo",
+      "editurl": "https://fallout.fandom.com/wiki/Stop_Gizmo?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Stop_Gizmo"
+    },
+    {
+      "pageid": 1657,
+      "ns": 0,
+      "title": "Stop the Radscorpions",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Articles with verified bugs"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Shady Sands quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:29:57Z",
+      "lastrevid": 4531753,
+      "length": 5103,
+      "fullurl": "https://fallout.fandom.com/wiki/Stop_the_Radscorpions",
+      "editurl": "https://fallout.fandom.com/wiki/Stop_the_Radscorpions?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Stop_the_Radscorpions"
+    },
+    {
+      "pageid": 31257,
+      "ns": 0,
+      "title": "Take down Decker",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout unmarked quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Hub quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:33:20Z",
+      "lastrevid": 4529787,
+      "length": 4885,
+      "fullurl": "https://fallout.fandom.com/wiki/Take_down_Decker",
+      "editurl": "https://fallout.fandom.com/wiki/Take_down_Decker?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Take_down_Decker"
+    },
+    {
+      "pageid": 8720,
+      "ns": 0,
+      "title": "Turn on power for the Glow",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:The Glow quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2026-04-12T07:31:02Z",
+      "lastrevid": 4490166,
+      "length": 2575,
+      "fullurl": "https://fallout.fandom.com/wiki/Turn_on_power_for_the_Glow",
+      "editurl": "https://fallout.fandom.com/wiki/Turn_on_power_for_the_Glow?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Turn_on_power_for_the_Glow"
+    },
+    {
+      "pageid": 50508,
+      "ns": 14,
+      "title": "Category:Fallout cut quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Cut quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout cut content"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-07-26T16:47:45Z",
+      "lastrevid": 4512323,
+      "length": 333,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_cut_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_cut_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_cut_quests"
+    },
+    {
+      "pageid": 445132,
+      "ns": 14,
+      "title": "Category:Fallout demo quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout demo"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-07-26T17:07:50Z",
+      "lastrevid": 4512334,
+      "length": 183,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_demo_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_demo_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_demo_quests"
+    },
+    {
+      "pageid": 831601,
+      "ns": 14,
+      "title": "Category:Hub quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:The Hub"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-06-20T18:58:56Z",
+      "lastrevid": 4490159,
+      "length": 162,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Hub_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Hub_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Hub_quests"
+    },
+    {
+      "pageid": 28449,
+      "ns": 14,
+      "title": "Category:Fallout quest images",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout images"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Quest images"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2022-07-07T13:02:00Z",
+      "lastrevid": 3896469,
+      "length": 167,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_quest_images",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_quest_images?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_quest_images"
+    },
+    {
+      "pageid": 10069,
+      "ns": 14,
+      "title": "Category:Fallout quest items",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout items"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Quest items"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-06-20T19:23:07Z",
+      "lastrevid": 4490192,
+      "length": 375,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_quest_items",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_quest_items?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_quest_items"
+    },
+    {
+      "pageid": 630941,
+      "ns": 14,
+      "title": "Category:Junktown quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Junktown"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-06-20T18:29:04Z",
+      "lastrevid": 4490119,
+      "length": 246,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Junktown_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Junktown_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Junktown_quests"
+    },
+    {
+      "pageid": 857549,
+      "ns": 14,
+      "title": "Category:Khan Base quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Khan Base"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-06-20T19:11:54Z",
+      "lastrevid": 4490180,
+      "length": 164,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Khan_Base_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Khan_Base_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Khan_Base_quests"
+    },
+    {
+      "pageid": 617544,
+      "ns": 14,
+      "title": "Category:Lost Hills quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Lost Hills"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-06-20T18:31:47Z",
+      "lastrevid": 4490125,
+      "length": 268,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Lost_Hills_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Lost_Hills_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Lost_Hills_quests"
+    },
+    {
+      "pageid": 629843,
+      "ns": 14,
+      "title": "Category:Boneyard quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Boneyard"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-09-03T21:32:46Z",
+      "lastrevid": 4490127,
+      "length": 235,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Boneyard_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Boneyard_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Boneyard_quests"
+    },
+    {
+      "pageid": 831600,
+      "ns": 14,
+      "title": "Category:Shady Sands quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Shady Sands"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-06-20T19:17:10Z",
+      "lastrevid": 4490186,
+      "length": 204,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Shady_Sands_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Shady_Sands_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Shady_Sands_quests"
+    },
+    {
+      "pageid": 857548,
+      "ns": 14,
+      "title": "Category:The Glow quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:The Glow"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-06-20T19:14:58Z",
+      "lastrevid": 4490184,
+      "length": 149,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:The_Glow_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:The_Glow_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:The_Glow_quests"
+    },
+    {
+      "pageid": 30317,
+      "ns": 14,
+      "title": "Category:Fallout unmarked quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Unmarked quests"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-07-17T16:42:36Z",
+      "lastrevid": 4507202,
+      "length": 306,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Fallout_unmarked_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Fallout_unmarked_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Fallout_unmarked_quests"
+    },
+    {
+      "pageid": 831599,
+      "ns": 14,
+      "title": "Category:Vault 13 quests",
+      "extract": "",
+      "categories": [
+        {
+          "ns": 14,
+          "title": "Category:Fallout quests"
+        },
+        {
+          "ns": 14,
+          "title": "Category:Vault 13"
+        }
+      ],
+      "contentmodel": "wikitext",
+      "pagelanguage": "en",
+      "pagelanguagehtmlcode": "en",
+      "pagelanguagedir": "ltr",
+      "touched": "2025-08-17T20:24:19Z",
+      "lastrevid": 4490170,
+      "length": 151,
+      "fullurl": "https://fallout.fandom.com/wiki/Category:Vault_13_quests",
+      "editurl": "https://fallout.fandom.com/wiki/Category:Vault_13_quests?action=edit",
+      "canonicalurl": "https://fallout.fandom.com/wiki/Category:Vault_13_quests"
+    }
+  ],
+  "count": 46
+}

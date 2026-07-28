@@ -1,0 +1,236 @@
+.terminal-container {
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Courier New', Courier, monospace;
+  --crt-intensity: 1;
+  --scanline-opacity: 0.1;
+  --glow-color: rgba(15, 255, 15, 0.4);
+  --text-color: #0f0;
+  --bg-color: #001100;
+}
+
+.terminal-container.stream-mode {
+  --text-color: #0ff;
+  font-size: 1.2em;
+  line-height: 1.6;
+}
+
+/* CRT Effect Container */
+.crt-effect {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-color);
+  position: relative;
+  clip-path: url(#crtPath);
+  overflow: hidden;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Add slight curvature effect */
+.crt-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Scanlines */
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, var(--scanline-opacity)) 0px,
+    transparent 1px,
+    transparent 2px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 3px
+  );
+  pointer-events: none;
+  z-index: 10;
+  opacity: var(--crt-intensity);
+}
+
+/* Vignette */
+.vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 200px rgba(0, 0, 0, 0.9), inset 0 0 100px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 9;
+}
+
+/* Terminal Layout */
+.terminal-layout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: 2rem;
+  color: var(--text-color);
+  text-shadow: 0 0 5px var(--glow-color);
+}
+
+.terminal-layout.full-view {
+  flex-direction: column;
+}
+
+.terminal-layout.split-view {
+  flex-direction: row;
+}
+
+.terminal-layout.split-view.focus-terminal .terminal-section {
+  flex: 2;
+}
+
+.terminal-layout.split-view.focus-terminal .visual-section {
+  flex: 1;
+}
+
+.terminal-layout.split-view.focus-visual .terminal-section {
+  flex: 1;
+}
+
+.terminal-layout.split-view.focus-visual .visual-section {
+  flex: 2;
+}
+
+.terminal-layout.split-view.focus-balanced .terminal-section,
+.terminal-layout.split-view.focus-balanced .visual-section {
+  flex: 1;
+}
+
+/* Terminal Section */
+.terminal-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-color) var(--bg-color);
+}
+
+.terminal-output::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-output::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+.terminal-output::-webkit-scrollbar-thumb {
+  background: var(--text-color);
+  border-radius: 4px;
+}
+
+.terminal-line {
+  margin: 0.25rem 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  animation: textGlow 0.1s ease-in;
+}
+
+.terminal-line.system {
+  color: #0ff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.terminal-line.command {
+  color: #ff0;
+  text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.terminal-line.error {
+  color: #f00;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+.terminal-line.output {
+  color: var(--text-color);
+}
+
+@keyframes textGlow {
+  from {
+    opacity: 0;
+    text-shadow: 0 0 20px var(--glow-color);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Visual Section */
+.visual-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-left: 2px solid var(--text-color);
+  padding-left: 2rem;
+  min-width: 0;
+  box-shadow: -5px 0 15px var(--glow-color);
+}
+
+.focus-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.focus-controls button {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--text-color);
+  color: var(--text-color);
+  font-family: 'Courier New', Courier, monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  text-shadow: 0 0 5px var(--glow-color);
+}
+
+.focus-controls button:hover {
+  background: var(--text-color);
+  color: var(--bg-color);
+  box-shadow: 0 0 10px var(--glow-color);
+}
+
+.focus-controls button.active {
+  background: var(--text-color);
+  color: var(--bg-color);
+  box-shadow: 0 0 15px var(--glow-color);
+}
+
+/* Flicker effect (subtle) */
+@keyframes flicker {
+  0% { opacity: 1; }
+  50% { opacity: 0.98; }
+  100% { opacity: 1; }
+}
+
+.terminal-container {
+  animation: flicker 0.15s infinite;
+}

@@ -1,0 +1,163 @@
+.character-sheet-panel {
+  padding: 1rem;
+}
+
+.sheet-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  color: #0ff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(0, 255, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.special-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.special-card {
+  border: 2px solid var(--text-color);
+  padding: 1rem;
+  text-align: center;
+  background: rgba(0, 17, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.special-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--glow-color);
+}
+
+.special-card-initial {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #ff0;
+  text-shadow: 0 0 15px rgba(255, 255, 0, 0.7);
+}
+
+.special-card-name {
+  font-size: 0.8rem;
+  margin: 0.5rem 0;
+  text-transform: uppercase;
+}
+
+.special-card-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.special-card-bar {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--text-color);
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.special-card-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0f0, #0a0);
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+  transition: width 0.3s ease;
+}
+
+.skills-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 60px;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem;
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  background: rgba(0, 17, 0, 0.2);
+}
+
+.skill-row.primary {
+  background: rgba(255, 255, 0, 0.1);
+  border-color: rgba(255, 255, 0, 0.3);
+}
+
+.skill-row.secondary {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.3);
+}
+
+.skill-tag {
+  font-size: 0.7rem;
+  color: #ff0;
+  margin-left: 0.5rem;
+}
+
+.sheet-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.sheet-section.half {
+  margin-bottom: 0;
+}
+
+.perks-list,
+.traits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.perk-item,
+.trait-item {
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  padding: 1rem;
+  background: rgba(0, 17, 0, 0.3);
+}
+
+.perk-name,
+.trait-name {
+  font-weight: bold;
+  color: #ff0;
+  margin-bottom: 0.25rem;
+}
+
+.perk-description,
+.trait-description {
+  font-size: 0.9rem;
+  color: rgba(0, 255, 0, 0.8);
+}
+
+.derived-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.derived-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  background: rgba(0, 17, 0, 0.3);
+}
+
+.derived-label {
+  color: #0ff;
+}
+
+.derived-value {
+  font-weight: bold;
+  color: #ff0;
+}

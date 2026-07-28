@@ -1,0 +1,11 @@
+{
+  "game_data_path": "../../",
+  "ai_state_file": "ai_state.json",
+  "ai_action_file": "ai_action.json",
+  "character_data_file": "character_data.json",
+  "poll_interval": 0.5,
+  "port": 5001,
+  "host": "localhost",
+  "debug": true,
+  "profiles_dir": "../profiles"
+}
