@@ -22,6 +22,12 @@ bool isPartyMember(Object* object);
 int getPartyMemberCount();
 int partyMemberPrepItemSaveAll();
 
+// Party order management
+int partyMemberSetOrder(Object* object, int order);  // 0 = player (fixed), 1-19 = follower positions
+int partyMemberGetOrder(Object* object);
+void partyMemberApplyOrder();  // Apply current ordering to party formation
+void partyMemberResetOrder();  // Reset to default join order
+
 } // namespace fallout
 
 #endif /* FALLOUT_GAME_PARTY_H_ */

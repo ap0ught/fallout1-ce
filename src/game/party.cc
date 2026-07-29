@@ -51,6 +51,10 @@ static int partyMemberItemRecoverAll();
 static int partyMemberClearItemList();
 static int partyFixMultipleMembers();
 
+// Party order tracking
+static int partyMemberOrder[20];  // Maps array index to display order (0 = player, 1-19 = followers)
+static bool partyOrderCustomized = false;
+
 // 0x50630C
 PartyMember* itemSaveListHead = NULL;
 
@@ -58,6 +62,7 @@ PartyMember* itemSaveListHead = NULL;
 static PartyMember partyMemberList[20];
 
 // Number of critters added to party.
+//
 //
 // 0x506310
 static int partyMemberCount = 0;
@@ -100,6 +105,9 @@ int partyMemberAdd(Object* object)
     object->flags |= (OBJECT_NO_REMOVE | OBJECT_NO_SAVE);
 
     partyMemberCount++;
+
+    // Initialize order for new member (append to end)
+    partyMemberOrder[partyMemberCount - 1] = partyMemberCount - 1;
 
     if (scr_ptr(object->sid, &script) != -1) {
         script->scr_flags |= (SCRIPT_FLAG_0x08 | SCRIPT_FLAG_0x10);
@@ -146,6 +154,8 @@ int partyMemberRemove(Object* object)
 
     if (index < partyMemberCount - 1) {
         partyMemberList[index].object = partyMemberList[partyMemberCount - 1].object;
+        // Also move the order entry
+        partyMemberOrder[index] = partyMemberOrder[partyMemberCount - 1];
     }
 
     object->flags &= ~(OBJECT_NO_REMOVE | OBJECT_NO_SAVE);
@@ -215,6 +225,12 @@ int partyMemberSave(DB_FILE* stream)
 
     if (db_fwriteInt(stream, partyMemberCount) == -1) return -1;
     if (db_fwriteInt(stream, partyMemberItemCount) == -1) return -1;
+    
+    // Save party order
+    if (db_fwriteInt(stream, partyOrderCustomized) == -1) return -1;
+    for (index = 0; index < partyMemberCount; index++) {
+        if (db_fwriteInt(stream, partyMemberOrder[index]) == -1) return -1;
+    }
 
     for (index = 1; index < partyMemberCount; index++) {
         partyMember = &(partyMemberList[index]);
@@ -366,6 +382,12 @@ int partyMemberLoad(DB_FILE* stream)
 
     if (db_freadInt(stream, &partyMemberCount) == -1) return -1;
     if (db_freadInt(stream, &partyMemberItemCount) == -1) return -1;
+    
+    // Load party order
+    if (db_freadInt(stream, &partyOrderCustomized) == -1) return -1;
+    for (index = 0; index < partyMemberCount; index++) {
+        if (db_freadInt(stream, &partyMemberOrder[index]) == -1) return -1;
+    }
 
     partyMemberList[0].object = obj_dude;
 
@@ -414,6 +436,12 @@ void partyMemberClear()
     partyMemberClearItemList();
 
     partyStatePrepped = 0;
+    partyOrderCustomized = false;
+    
+    // Reset order to default
+    for (index = 0; index < 20; index++) {
+        partyMemberOrder[index] = index;
+    }
 }
 
 // 0x4859C8
@@ -433,7 +461,7 @@ int partyMemberSyncPosition()
 }
 
 // Heals party members according to their healing rate.
-//
+// 
 // 0x485A18
 int partyMemberRestingHeal(int a1)
 {
@@ -475,7 +503,7 @@ Object* partyMemberFindObjFromPid(int pid)
 }
 
 // Returns `true` if specified object is a party member.
-//
+// 
 // 0x485AAC
 bool isPartyMember(Object* object)
 {
@@ -495,7 +523,7 @@ bool isPartyMember(Object* object)
 }
 
 // Returns number of active critters in the party.
-//
+// 
 // 0x485AE8
 int getPartyMemberCount()
 {
@@ -833,7 +861,7 @@ static int partyFixMultipleMembers()
                         object->sid = -1;
                     } else {
                         if (queue_remove_this(object, EVENT_TYPE_SCRIPT) == -1) {
-                            debug_printf("\nERROR Removing Timed Events on FIX remove!!\n");
+                            debug_printf("\nERROR Removing Timed Events on FIX remove!!");
                         }
                     }
 
@@ -860,6 +888,73 @@ static int partyFixMultipleMembers()
     debug_printf("\nTotal Critter Count: %d\n\n", critterCount);
 
     return 0;
+}
+
+// Party order management functions
+int partyMemberSetOrder(Object* object, int order)
+{
+    // Validate order: 0 is reserved for player, 1-19 for followers
+    if (order < 0 || order > 19) {
+        return -1;
+    }
+    
+    // Find the object in the party
+    int index = -1;
+    for (int i = 0; i < partyMemberCount; i++) {
+        if (partyMemberList[i].object == object) {
+            index = i;
+            break;
+        }
+    }
+    
+    if (index == -1) {
+        return -1;  // Object not in party
+    }
+    
+    // Check if order is already taken by another party member
+    for (int i = 0; i < partyMemberCount; i++) {
+        if (i != index && partyMemberOrder[i] == order) {
+            return -1;  // Order already taken
+        }
+    }
+    
+    // Special case: player character (obj_dude) must always be at position 0
+    if (object == obj_dude && order != 0) {
+        return -1;
+    }
+    
+    // Set the order
+    partyMemberOrder[index] = order;
+    partyOrderCustomized = true;
+    
+    return 0;
+}
+
+int partyMemberGetOrder(Object* object)
+{
+    // Find the object in the party
+    for (int i = 0; i < partyMemberCount; i++) {
+        if (partyMemberList[i].object == object) {
+            return partyMemberOrder[i];
+        }
+    }
+    
+    return -1;  // Object not in party
+}
+
+void partyMemberApplyOrder()
+{
+    // Apply the current ordering to party formation/positioning
+    partyMemberSyncPosition();
+}
+
+void partyMemberResetOrder()
+{
+    // Reset to default join order
+    partyOrderCustomized = false;
+    for (int i = 0; i < partyMemberCount; i++) {
+        partyMemberOrder[i] = i;
+    }
 }
 
 } // namespace fallout
