@@ -50,6 +50,9 @@ void GNW95_process_message();
 void GNW95_clear_time_stamps();
 void GNW95_lost_focus();
 
+void agent_process_key(KeyboardData* data);
+void agent_simulate_key(int scancode, bool uppercase = false);
+
 void beginTextInput();
 void endTextInput();
 

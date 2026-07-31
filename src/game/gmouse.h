@@ -112,6 +112,10 @@ int gmouse_3d_build_to_hit_frame(const char* string, int color);
 int gmouse_3d_build_hex_frame(const char* string, int color);
 void gmouse_3d_synch_item_highlight();
 void gmouse_remove_item_outline(Object* object);
+int gmouse_3d_open_context_menu(int mouseX, int mouseY, int elevation);
+void gmouse_3d_close_context_menu();
+void gmouse_3d_select_context_menu_item(int index);
+bool gmouse_3d_is_context_menu_open();
 
 void gameMouseRefreshImmediately();
 

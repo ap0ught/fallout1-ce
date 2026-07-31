@@ -46,6 +46,8 @@ static int gmouse_3d_set_flat_fid(int fid, Rect* rect);
 static int gmouse_3d_reset_flat_fid(Rect* rect);
 static int gmouse_3d_move_to(int x, int y, int elevation, Rect* a4);
 static int gmouse_check_scrolling(int x, int y, int cursor);
+static int gmouse_3d_build_action_items_for_target(Object* target, int* items);
+static void gmouse_3d_execute_context_menu_action(int actionItem, Object* target);
 
 // 0x505258
 static bool gmouse_initialized = false;
@@ -287,6 +289,14 @@ static Object* outlined_object = NULL;
 // 0x5053F4
 bool gmouse_clicked_on_edge = false;
 
+static bool gmouse_3d_context_menu_open = false;
+static Object* gmouse_3d_context_menu_target = NULL;
+static Rect gmouse_3d_context_menu_rect;
+static int gmouse_3d_context_menu_items[GAME_MOUSE_ACTION_MENU_ITEM_COUNT];
+static int gmouse_3d_context_menu_count = 0;
+static int gmouse_3d_context_menu_item_height = 0;
+static int gmouse_3d_context_menu_start_y = 0;
+
 // 0x5951E0
 static int gmouse_3d_menu_frame_actions[GAME_MOUSE_ACTION_MENU_ITEM_COUNT];
 
@@ -326,6 +336,10 @@ int gmouse_reset()
 {
     if (!gmouse_initialized) {
         return -1;
+    }
+
+    if (gmouse_3d_context_menu_open) {
+        gmouse_3d_close_context_menu();
     }
 
     // NOTE: Uninline.
@@ -385,6 +399,10 @@ void gmouse_enable()
 void gmouse_disable(int a1)
 {
     if (gmouse_enabled) {
+        if (gmouse_3d_context_menu_open) {
+            gmouse_3d_close_context_menu();
+        }
+
         gmouse_set_cursor(MOUSE_CURSOR_NONE);
         gmouse_enabled = 0;
 
@@ -608,6 +626,24 @@ void gmouse_bk_process()
     if (gmouse_bk_last_cursor != -1) {
         gmouse_set_cursor(gmouse_bk_last_cursor);
         gmouse_bk_last_cursor = -1;
+    }
+
+    if (gmouse_3d_context_menu_open) {
+        int dy = mouseY - gmouse_3d_context_menu_start_y;
+        int index = 0;
+        if (gmouse_3d_context_menu_item_height > 0) {
+            index = dy / gmouse_3d_context_menu_item_height;
+        }
+        if (index < 0) {
+            index = 0;
+        }
+        if (index >= gmouse_3d_context_menu_count) {
+            index = gmouse_3d_context_menu_count - 1;
+        }
+        if (gmouse_3d_highlight_menu_frame(index) == 0) {
+            tile_refresh_rect(&gmouse_3d_context_menu_rect, map_elevation);
+        }
+        return;
     }
 
     if (win_get_top_win(mouseX, mouseY) != display_win) {
@@ -864,6 +900,18 @@ void gmouse_handle_event(int mouseX, int mouseY, int mouseState)
         return;
     }
 
+    if (gmouse_3d_context_menu_open) {
+        if ((mouseState & MOUSE_EVENT_RIGHT_BUTTON_DOWN) != 0) {
+            gmouse_3d_close_context_menu();
+            return;
+        }
+        if ((mouseState & MOUSE_EVENT_LEFT_BUTTON_UP) != 0) {
+            gmouse_3d_select_context_menu_item(gmouse_3d_menu_current_action_index);
+            return;
+        }
+        return;
+    }
+
     if ((mouseState & MOUSE_EVENT_RIGHT_BUTTON_DOWN) != 0) {
         if ((mouseState & MOUSE_EVENT_RIGHT_BUTTON_REPEAT) == 0) {
             if (gmouse_3d_is_on()) {
@@ -1009,57 +1057,18 @@ void gmouse_handle_event(int mouseX, int mouseY, int mouseState)
         }
     }
 
+    if ((mouseState & MOUSE_EVENT_LEFT_BUTTON_DOWN) != 0
+        && (keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL])
+        && gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
+        gmouse_3d_open_context_menu(mouseX, mouseY, map_elevation);
+        return;
+    }
+
     if ((mouseState & MOUSE_EVENT_LEFT_BUTTON_DOWN_REPEAT) == MOUSE_EVENT_LEFT_BUTTON_DOWN_REPEAT && gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
         Object* target = object_under_mouse(-1, true, map_elevation);
         if (target != NULL) {
-            int actionMenuItemsCount = 0;
-            int actionMenuItems[6];
-            switch (FID_TYPE(target->fid)) {
-            case OBJ_TYPE_ITEM:
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_USE;
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
-                if (item_get_type(target) == ITEM_TYPE_CONTAINER) {
-                    actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
-                    actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_USE_SKILL;
-                }
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
-                break;
-            case OBJ_TYPE_CRITTER:
-                if (target == obj_dude) {
-                    actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_ROTATE;
-                } else {
-                    if (obj_action_can_talk_to(target)) {
-                        if (!isInCombat()) {
-                            actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_TALK;
-                        }
-                    } else {
-                        actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_USE;
-                    }
-                }
-
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_USE_SKILL;
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
-                break;
-            case OBJ_TYPE_SCENERY:
-                if (proto_action_can_use(target->pid)) {
-                    actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_USE;
-                }
-
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_USE_SKILL;
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
-                break;
-            case OBJ_TYPE_WALL:
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
-                if (proto_action_can_use(target->pid)) {
-                    actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
-                }
-                actionMenuItems[actionMenuItemsCount++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
-                break;
-            }
+            int actionMenuItems[GAME_MOUSE_ACTION_MENU_ITEM_COUNT];
+            int actionMenuItemsCount = gmouse_3d_build_action_items_for_target(target, actionMenuItems);
 
             if (gmouse_3d_build_menu_frame(mouseX, mouseY, actionMenuItems, actionMenuItemsCount, scr_size.lrx - scr_size.ulx + 1, scr_size.lry - scr_size.uly - 99) == 0) {
                 Rect v43;
@@ -1301,6 +1310,10 @@ void gmouse_3d_set_mode(int mode)
 
     if (mode == gmouse_3d_current_mode) {
         return;
+    }
+
+    if (gmouse_3d_context_menu_open) {
+        gmouse_3d_close_context_menu();
     }
 
     int fid = art_id(OBJ_TYPE_INTERFACE, 0, 0, 0, 0);
@@ -2379,6 +2392,236 @@ static int gmouse_check_scrolling(int x, int y, int cursor)
     }
 
     return 0;
+}
+
+static int gmouse_3d_build_action_items_for_target(Object* target, int* items)
+{
+    int count = 0;
+
+    switch (FID_TYPE(target->fid)) {
+    case OBJ_TYPE_ITEM:
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_USE;
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
+        if (item_get_type(target) == ITEM_TYPE_CONTAINER) {
+            items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
+            items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_USE_SKILL;
+        }
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
+        break;
+    case OBJ_TYPE_CRITTER:
+        if (target == obj_dude) {
+            items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_ROTATE;
+        } else {
+            if (obj_action_can_talk_to(target)) {
+                if (!isInCombat()) {
+                    items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_TALK;
+                }
+            } else {
+                items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_USE;
+            }
+        }
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_USE_SKILL;
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
+        break;
+    case OBJ_TYPE_SCENERY:
+        if (proto_action_can_use(target->pid)) {
+            items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_USE;
+        }
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_USE_SKILL;
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
+        break;
+    case OBJ_TYPE_WALL:
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_LOOK;
+        if (proto_action_can_use(target->pid)) {
+            items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY;
+        }
+        items[count++] = GAME_MOUSE_ACTION_MENU_ITEM_CANCEL;
+        break;
+    }
+
+    return count;
+}
+
+static void gmouse_3d_execute_context_menu_action(int actionItem, Object* target)
+{
+    Rect tmp;
+
+    switch (actionItem) {
+    case GAME_MOUSE_ACTION_MENU_ITEM_INVENTORY:
+        use_inventory_on(target);
+        break;
+    case GAME_MOUSE_ACTION_MENU_ITEM_LOOK:
+        if (obj_examine(obj_dude, target) == -1) {
+            obj_look_at(obj_dude, target);
+        }
+        break;
+    case GAME_MOUSE_ACTION_MENU_ITEM_ROTATE:
+        if (obj_inc_rotation(target, &tmp) == 0) {
+            tile_refresh_rect(&tmp, target->elevation);
+        }
+        break;
+    case GAME_MOUSE_ACTION_MENU_ITEM_TALK:
+        action_talk_to(obj_dude, target);
+        break;
+    case GAME_MOUSE_ACTION_MENU_ITEM_USE:
+        switch (FID_TYPE(target->fid)) {
+        case OBJ_TYPE_SCENERY:
+            action_use_an_object(obj_dude, target);
+            break;
+        case OBJ_TYPE_CRITTER:
+            action_loot_container(obj_dude, target);
+            break;
+        default:
+            action_get_an_object(obj_dude, target);
+            break;
+        }
+        break;
+    case GAME_MOUSE_ACTION_MENU_ITEM_USE_SKILL:
+        if (1) {
+            int skill = -1;
+            int rc = skilldex_select();
+            switch (rc) {
+            case SKILLDEX_RC_SNEAK:
+                action_skill_use(SKILL_SNEAK);
+                break;
+            case SKILLDEX_RC_LOCKPICK:
+                skill = SKILL_LOCKPICK;
+                break;
+            case SKILLDEX_RC_STEAL:
+                skill = SKILL_STEAL;
+                break;
+            case SKILLDEX_RC_TRAPS:
+                skill = SKILL_TRAPS;
+                break;
+            case SKILLDEX_RC_FIRST_AID:
+                skill = SKILL_FIRST_AID;
+                break;
+            case SKILLDEX_RC_DOCTOR:
+                skill = SKILL_DOCTOR;
+                break;
+            case SKILLDEX_RC_SCIENCE:
+                skill = SKILL_SCIENCE;
+                break;
+            case SKILLDEX_RC_REPAIR:
+                skill = SKILL_REPAIR;
+                break;
+            }
+            if (skill != -1) {
+                action_use_skill_on(obj_dude, target, skill);
+            }
+        }
+        break;
+    }
+}
+
+int gmouse_3d_open_context_menu(int mouseX, int mouseY, int elevation)
+{
+    if (!gmouse_initialized || !gmouse_enabled) {
+        return -1;
+    }
+
+    if (gmouse_3d_context_menu_open) {
+        gmouse_3d_close_context_menu();
+    }
+
+    Object* target = object_under_mouse(-1, true, elevation);
+    if (target == NULL) {
+        return -1;
+    }
+
+    int actionMenuItems[GAME_MOUSE_ACTION_MENU_ITEM_COUNT];
+    int actionMenuItemsCount = gmouse_3d_build_action_items_for_target(target, actionMenuItems);
+    if (actionMenuItemsCount == 0) {
+        return -1;
+    }
+
+    if (gmouse_3d_build_menu_frame(mouseX, mouseY, actionMenuItems, actionMenuItemsCount,
+            scr_size.lrx - scr_size.ulx + 1, scr_size.lry - scr_size.uly - 99)
+        != 0) {
+        return -1;
+    }
+
+    Rect rect;
+    int fid = art_id(OBJ_TYPE_INTERFACE, 283, 0, 0, 0);
+    if (gmouse_3d_set_flat_fid(fid, &rect) != 0) {
+        return -1;
+    }
+
+    if (gmouse_3d_move_to(mouseX, mouseY, elevation, &rect) != 0) {
+        return -1;
+    }
+
+    tile_refresh_rect(&rect, elevation);
+
+    CacheEntry* itemFrmHandle;
+    int itemFid = art_id(OBJ_TYPE_INTERFACE, gmouse_3d_action_nums[actionMenuItems[0]], 0, 0, 0);
+    Art* itemFrm = art_ptr_lock(itemFid, &itemFrmHandle);
+    if (itemFrm != NULL) {
+        gmouse_3d_context_menu_item_height = art_frame_length(itemFrm, 0, 0);
+        art_ptr_unlock(itemFrmHandle);
+    } else {
+        gmouse_3d_context_menu_item_height = 10;
+    }
+
+    gmouse_3d_context_menu_open = true;
+    gmouse_3d_context_menu_target = target;
+    gmouse_3d_context_menu_rect = rect;
+    gmouse_3d_context_menu_start_y = mouseY;
+    gmouse_3d_context_menu_count = actionMenuItemsCount;
+    memcpy(gmouse_3d_context_menu_items, actionMenuItems, sizeof(int) * actionMenuItemsCount);
+
+    return 0;
+}
+
+void gmouse_3d_close_context_menu()
+{
+    if (!gmouse_3d_context_menu_open) {
+        return;
+    }
+
+    Rect rect;
+    if (gmouse_3d_reset_flat_fid(&rect) == 0) {
+        tile_refresh_rect(&rect, map_elevation);
+    }
+
+    gmouse_3d_context_menu_open = false;
+    gmouse_3d_context_menu_target = NULL;
+    gmouse_3d_context_menu_count = 0;
+
+    gmouse_3d_hover_test = false;
+    gmouse_3d_last_mouse_x = -1;
+    gmouse_3d_last_mouse_y = -1;
+    gmouse_3d_last_move_time = get_time();
+}
+
+void gmouse_3d_select_context_menu_item(int index)
+{
+    if (!gmouse_3d_context_menu_open) {
+        return;
+    }
+
+    if (index < 0 || index >= gmouse_3d_context_menu_count) {
+        gmouse_3d_close_context_menu();
+        return;
+    }
+
+    int actionItem = gmouse_3d_context_menu_items[index];
+    Object* target = gmouse_3d_context_menu_target;
+
+    gmouse_3d_close_context_menu();
+
+    if (target != NULL) {
+        gmouse_3d_execute_context_menu_action(actionItem, target);
+    }
+}
+
+bool gmouse_3d_is_context_menu_open()
+{
+    return gmouse_3d_context_menu_open;
 }
 
 // 0x445FD0

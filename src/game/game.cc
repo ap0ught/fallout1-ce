@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "agent/agent_ipc.h"
+
 #include "game/actions.h"
 #include "game/anim.h"
 #include "game/automap.h"
@@ -344,6 +346,8 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
 
     debug_printf(">init_options_menu\n");
 
+    agent_ipc_init();
+
     return 0;
 }
 
@@ -388,6 +392,8 @@ void game_reset()
 // 0x43B654
 void game_exit()
 {
+    agent_ipc_shutdown();
+
     tile_disable_refresh();
     message_exit(&misc_message_file);
     combat_exit();

@@ -45,6 +45,8 @@
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 
+#include "agent/commands/command_inventory.h"
+
 namespace fallout {
 
 #define INVENTORY_WINDOW_X 80
@@ -348,6 +350,10 @@ static Inventory* target_pud;
 // 0x59CEE4
 static int barter_back_win;
 
+static bool inventory_open = false;
+static bool loot_open = false;
+static bool barter_open = false;
+
 // 0x4623E8
 void inven_set_dude(Object* obj, int pid)
 {
@@ -590,6 +596,8 @@ bool setup_inventory(int inventoryWindowType)
             INVENTORY_TRADE_WINDOW_WIDTH);
 
         display_msg = gdialog_display_msg;
+
+        barter_open = true;
     }
 
     if (inventoryWindowType == INVENTORY_WINDOW_TYPE_LOOT) {
@@ -632,6 +640,8 @@ bool setup_inventory(int inventoryWindowType)
                 win_register_button_func(btn, inven_hover_on, inven_hover_off, NULL, NULL);
             }
         }
+
+        loot_open = true;
     } else if (inventoryWindowType == INVENTORY_WINDOW_TYPE_TRADE) {
         int y1 = INVENTORY_TRADE_SCROLLER_Y;
         int y2 = INVENTORY_TRADE_INNER_SCROLLER_Y;
@@ -1232,6 +1242,8 @@ bool setup_inventory(int inventoryWindowType)
     bool isoWasEnabled = map_disable_bk_processes();
 
     gmouse_disable(0);
+    
+    inventory_open = true;
 
     return isoWasEnabled;
 }
@@ -1275,6 +1287,8 @@ void exit_inventory(bool shouldEnableIso)
     win_delete(i_wid);
 
     gmouse_enable();
+
+    inventory_open = false;
 
     if (dropped_explosive) {
         Attack v1;
@@ -4950,6 +4964,8 @@ void container_exit(int keyCode, int inventoryWindowType)
             win_draw(i_wid);
         }
     }
+
+    loot_open = false;
 }
 
 // 0x469090
@@ -5397,5 +5413,167 @@ int inven_set_timer(Object* a1)
 
     return seconds;
 }
+
+int agent_equip_item(int index, int hand)
+{
+    if (!inventory_open) {
+        return -1;
+    }
+
+    Inventory* inv = &(obj_dude->data.inventory);
+    if (index >= inv->length) {
+        return -1;
+    }
+
+    Object* item = inv->items[index].item;
+    int itemType = item_get_type(item);
+
+    if (itemType == ITEM_TYPE_ARMOR) {
+        Object* oldArmor = i_worn;
+        if (oldArmor != NULL) {
+            oldArmor->flags &= ~OBJECT_WORN;
+        }
+
+        item->flags |= OBJECT_WORN;
+        i_worn = item;
+        adjust_ac(inven_dude, oldArmor, item);
+    } else {
+        Object** slot = hand ? &i_rhand : &i_lhand;
+        switch_hand(item, slot, NULL, index);
+    }
+
+    adjust_fid();
+    display_stats();
+    display_inventory(0, -1, INVENTORY_WINDOW_TYPE_NORMAL);
+    win_draw(i_wid);
+
+    return 0;
+}
+
+int agent_unequip_item(int slot) {
+    if (!inventory_open) {
+        return -1;
+    }
+
+    if (slot == 0 || slot == 1) {
+        Object** slotPtr = slot ? &i_rhand : &i_lhand;
+        if (*slotPtr != NULL) {
+            (*slotPtr)->flags &= ~OBJECT_IN_ANY_HAND;
+            *slotPtr = NULL;
+        }
+    } else if (slot == 2) {
+        Object* armor = inven_worn(obj_dude);
+        if (armor == NULL) {
+            return -1;
+        }
+        adjust_ac(obj_dude, armor, NULL);
+        armor->flags &= ~OBJECT_WORN;
+
+        int fid = art_id(OBJ_TYPE_CRITTER,
+            obj_dude->fid & 0xFFF,
+            FID_ANIM_TYPE(obj_dude->fid),
+            0,
+            obj_dude->rotation + 1);
+        obj_change_fid(obj_dude, fid, NULL);
+    } else {
+        return -1;
+    }
+
+    adjust_fid();
+    display_stats();
+    display_inventory(0, -1, INVENTORY_WINDOW_TYPE_NORMAL);
+    win_draw(i_wid);
+
+    return 0;
+}
+
+int agent_loot_item(int index, bool take, int quantity)
+{
+    if (take) {
+        if (target_pud == NULL || index >= target_pud->length) {
+            return -1;
+        }
+        Object* item = target_pud->items[index].item;
+        if (item_move(target_stack[target_curr_stack], inven_dude, item, quantity) != 0) {
+            return -1;
+        }
+    } else {
+        if (pud == NULL || index >= pud->length) {
+            return -1;
+        }
+        Object* item = pud->items[index].item;
+        if (item_move(inven_dude, target_stack[target_curr_stack], item, quantity) != 0) {
+            return -1;
+        }
+    }
+
+    display_inventory(stack_offset[curr_stack], -1, INVENTORY_WINDOW_TYPE_LOOT);
+    display_target_inventory(target_stack_offset[target_curr_stack], -1, target_pud, INVENTORY_WINDOW_TYPE_LOOT);
+    win_draw(i_wid);
+
+    return 0;
+}
+
+int agent_barter_item(int index, int action, int quantity)
+{
+    switch (action) {
+    case ACTION_SELL: {
+        if (pud == NULL || index >= pud->length) {
+            return -1;
+        }
+        Object* item = pud->items[index].item;
+        if (item_move_force(inven_dude, ptable, item, quantity) == -1) {
+            return -1;
+        }
+        break;
+    }
+    case ACTION_BUY: {
+        if (target_pud == NULL || index >= target_pud->length) {
+            return -1;
+        }
+        Object* item = target_pud->items[index].item;
+        if (item_move_force(target_stack[0], btable, item, quantity) == -1) {
+            return -1;
+        }
+        break;
+    }
+    case ACTION_RETRACT_MINE: {
+        if (ptable_pud == NULL || index >= ptable_pud->length) {
+            return -1;
+        }
+        Object* item = ptable_pud->items[index].item;
+        if (item_move_force(ptable, inven_dude, item, quantity) == -1) {
+            return -1;
+        }
+        break;
+    }
+    case ACTION_RETRACT_THEIRS: {
+        if (btable_pud == NULL || index >= btable_pud->length) {
+            return -1;
+        }
+        Object* item = btable_pud->items[index].item;
+        if (item_move_force(btable, target_stack[0], item, quantity) == -1) {
+            return -1;
+        }
+        break;
+    }
+    case ACTION_BARTER_CONFIRM: {   // confirm
+        if (barter_attempt_transaction(obj_dude, ptable, target_stack[0], btable) != 0) {
+            return -1;
+        }
+        break;
+    }
+    default:
+        return -1;
+    }
+
+    display_inventory(stack_offset[curr_stack], -1, INVENTORY_WINDOW_TYPE_TRADE);
+    display_target_inventory(target_stack_offset[target_curr_stack], -1, target_pud, INVENTORY_WINDOW_TYPE_TRADE);
+    display_table_inventories(barter_back_win, ptable, btable, -1);
+    win_draw(i_wid);
+
+    return 0;
+}
+
 
 } // namespace fallout

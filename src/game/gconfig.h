@@ -8,6 +8,11 @@ namespace fallout {
 // The file name of the main config file.
 #define GAME_CONFIG_FILE_NAME "fallout.cfg"
 
+#define GAME_CONFIG_AGENT_KEY "agent"
+#define GAME_CONFIG_AGENT_PATH_KEY "agent_path"
+#define GAME_CONFIG_AGENT_PORT_KEY "agent_port"
+#define GAME_CONFIG_AGENT_START_TIMEOUT_KEY "agent_start_timeout"
+
 #define GAME_CONFIG_SYSTEM_KEY "system"
 #define GAME_CONFIG_PREFERENCES_KEY "preferences"
 #define GAME_CONFIG_SOUND_KEY "sound"

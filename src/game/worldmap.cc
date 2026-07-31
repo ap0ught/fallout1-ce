@@ -48,6 +48,9 @@
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 
+#include "agent/agent_ipc.h"
+#include "agent/agent_movie.h"
+
 namespace fallout {
 
 #define WM_WINDOW_WIDTH 640
@@ -2445,6 +2448,11 @@ static int CheckEvents()
         debug_printf("\nWORLD MAP: Vault water time ran out (death).\n");
         BlackOut();
         gmovie_play(MOVIE_BOIL3, GAME_MOVIE_FADE_IN | GAME_MOVIE_FADE_OUT | GAME_MOVIE_PAUSE_MUSIC);
+
+        if (agent_ipc_connected()) {
+            agent_send_movie_summary(MOVIE_BOIL3);
+        }
+
         game_user_wants_to_quit = 1;
         rc = 1;
     } else {
@@ -2454,6 +2462,11 @@ static int CheckEvents()
                 debug_printf("\nWORLD MAP: Doing \"Vats explode\" specail.\n");
 
                 gmovie_play(MOVIE_VEXPLD, GAME_MOVIE_FADE_IN | GAME_MOVIE_FADE_OUT | GAME_MOVIE_PAUSE_MUSIC);
+
+                if (agent_ipc_connected()) {
+                    agent_send_movie_summary(MOVIE_VEXPLD);
+                }
+
                 game_global_vars[GVAR_DESTROY_MASTER_4] = 2;
 
                 if (game_global_vars[GVAR_MASTER_BLOWN] != 0) {
@@ -2488,6 +2501,11 @@ static int CheckEvents()
                 debug_printf("\nWORLD MAP: Doing \"Master lair explode\" specail.\n");
 
                 gmovie_play(MOVIE_CATHEXP, GAME_MOVIE_FADE_IN | GAME_MOVIE_FADE_OUT | GAME_MOVIE_PAUSE_MUSIC);
+
+                if (agent_ipc_connected()) {
+                    agent_send_movie_summary(MOVIE_CATHEXP);
+                }
+
                 game_global_vars[GVAR_DESTROY_MASTER_5] = 2;
 
                 if (game_global_vars[GVAR_VATS_BLOWN] != 0) {

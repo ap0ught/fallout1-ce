@@ -391,3 +391,8 @@ FodyWeavers.xsd
 # CMake
 /out
 /build
+
+# Agent testing
+agent/.env
+agent/venv
+agent/screenshots

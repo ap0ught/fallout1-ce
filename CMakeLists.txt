@@ -270,6 +270,24 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/pointer_registry.h"
     "src/plib/gnw/touch.cc"
     "src/plib/gnw/touch.h"
+    "src/agent/agent_ipc.cc"
+    "src/agent/agent_ipc.h"
+    "src/agent/agent_commands.cc"
+    "src/agent/agent_commands.h"
+    "src/agent/commands/command_navigate.cc"
+    "src/agent/commands/command_navigate.h"
+    "src/agent/commands/command_combat.cc"
+    "src/agent/commands/command_combat.h"
+    "src/agent/commands/command_inventory.cc"
+    "src/agent/commands/command_inventory.h"
+    "src/agent/commands/command_input.cc"
+    "src/agent/commands/command_input.h"
+    "src/agent/commands/command_item.cc"
+    "src/agent/commands/command_item.h"
+    "src/agent/commands/command_save.cc"
+    "src/agent/commands/command_save.h"
+    "src/agent/agent_movie.cc"
+    "src/agent/agent_movie.h"
 )
 
 if(IOS)
@@ -291,6 +309,7 @@ endif()
 if(WIN32)
     target_link_libraries(${EXECUTABLE_NAME}
         winmm
+        ws2_32
     )
 endif()
 
@@ -347,8 +366,10 @@ endif()
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux") AND (NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") AND (NOT ${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD"))
     add_subdirectory("third_party/sdl2")
+    add_subdirectory("third_party/sdl2_net")
 else()
     find_package(SDL2)
+    find_package(SDL2_net)
 endif()
 
 add_subdirectory("third_party/adecode")
@@ -357,8 +378,8 @@ target_link_libraries(${EXECUTABLE_NAME} adecode::adecode)
 add_subdirectory("third_party/fpattern")
 target_link_libraries(${EXECUTABLE_NAME} fpattern::fpattern)
 
-target_link_libraries(${EXECUTABLE_NAME} ${SDL2_LIBRARIES})
-target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(${EXECUTABLE_NAME} ${SDL2_LIBRARIES} ${SDL2_NET_LIBRARIES})
+target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SDL2_INCLUDE_DIRS} ${SDL2_NET_INCLUDE_DIRS})
 
 if(APPLE)
     if(IOS)

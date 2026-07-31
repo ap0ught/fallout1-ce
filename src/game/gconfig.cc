@@ -54,6 +54,9 @@ bool gconfig_init(bool isMapper, int argc, char** argv)
     }
 
     // Initialize defaults.
+    config_set_value(&game_config, GAME_CONFIG_AGENT_KEY, GAME_CONFIG_AGENT_PORT_KEY, 49152);
+    config_set_value(&game_config, GAME_CONFIG_AGENT_KEY, GAME_CONFIG_AGENT_START_TIMEOUT_KEY, 10000);
+
     config_set_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_EXECUTABLE_KEY, "game");
     config_set_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_DAT_KEY, "master.dat");
     config_set_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_PATCHES_KEY, "data");

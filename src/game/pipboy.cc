@@ -35,6 +35,9 @@
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 
+#include "agent/agent_ipc.h"
+#include "agent/agent_movie.h"
+
 namespace fallout {
 
 #define PIPBOY_RAND_MAX 32767
@@ -1750,6 +1753,10 @@ static void PipArchives(int a1)
 
         if (movie <= MOVIE_COUNT) {
             gmovie_play(movie, GAME_MOVIE_FADE_IN | GAME_MOVIE_FADE_OUT | GAME_MOVIE_PAUSE_MUSIC);
+
+            if (agent_ipc_connected()) {
+                agent_send_movie_summary(movie);
+            }
         } else {
             debug_printf("\n ** Selected movie not found in list! **\n");
         }

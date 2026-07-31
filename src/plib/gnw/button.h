@@ -28,6 +28,7 @@ int win_group_check_buttons(int buttonCount, int* btns, int maxChecked, RadioBut
 int win_group_radio_buttons(int buttonCount, int* btns);
 void GNW_button_refresh(Window* window, Rect* rect);
 int win_button_press_and_release(int btn);
+void GNW_reset_last_button_winID();
 
 } // namespace fallout
 

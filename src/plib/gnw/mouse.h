@@ -3,6 +3,7 @@
 
 #include "plib/gnw/rect.h"
 #include "plib/gnw/svga_types.h"
+#include "plib/gnw/dxinput.h"
 
 namespace fallout {
 
@@ -59,6 +60,8 @@ void mouse_set_sensitivity(double value);
 double mouse_get_sensitivity();
 unsigned int mouse_elapsed_time();
 void mouse_reset_elapsed_time();
+
+void mouse_get_agent_delta(MouseData* mouseData);
 
 void mouseGetPositionInWindow(int win, int* x, int* y);
 bool mouseHitTestInWindow(int win, int left, int top, int right, int bottom);

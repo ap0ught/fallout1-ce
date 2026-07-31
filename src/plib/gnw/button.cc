@@ -512,7 +512,7 @@ int GNW_check_buttons(Window* w, int* keyCodePtr)
                             }
 
                             if (button != w->hoveredButton && button != w->clickedButton) {
-                                break;
+                                w->hoveredButton = button;
                             }
 
                             w->clickedButton = button;
@@ -1234,6 +1234,11 @@ int win_button_press_and_release(int btn)
     }
 
     return 0;
+}
+
+void GNW_reset_last_button_winID()
+{
+    last_button_winID = -1;
 }
 
 } // namespace fallout

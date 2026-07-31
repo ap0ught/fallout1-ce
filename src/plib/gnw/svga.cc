@@ -94,7 +94,10 @@ bool svga_init(VideoOptions* video_options)
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    gSdlWindow = SDL_CreateWindow(GNW95_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    SDL_Rect displayBounds;
+    SDL_GetDisplayUsableBounds(0, &displayBounds);
+
+    gSdlWindow = SDL_CreateWindow(GNW95_title, displayBounds.x, displayBounds.y,
         video_options->width * video_options->scale,
         video_options->height * video_options->scale,
         windowFlags);

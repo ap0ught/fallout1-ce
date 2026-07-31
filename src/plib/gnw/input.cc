@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdio.h>
 
+#include "agent/agent_ipc.h"
 #include "audio_engine.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
@@ -1127,8 +1128,11 @@ void GNW95_process_message()
                 audioEngineResume();
                 break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
-                GNW95_isActive = false;
-                audioEnginePause();
+                // Keep the game running in the background so we can use the Python console
+                if (!agent_ipc_connected()) {
+                    GNW95_isActive = false;
+                    audioEnginePause();
+                }
                 break;
             }
             break;
@@ -1160,6 +1164,8 @@ void GNW95_process_message()
             }
         }
     }
+
+    agent_ipc_poll();
 }
 
 // 0x4B4638
@@ -1199,6 +1205,34 @@ static void GNW95_process_key(KeyboardData* data)
         }
 
         kb_simulate_key(data);
+    }
+}
+
+void agent_process_key(KeyboardData* data)
+{
+    GNW95_process_key(data);
+}
+
+void agent_simulate_key(int scancode, bool uppercase)
+{
+    KeyboardData keyboardData;
+
+    if (uppercase) {
+        keyboardData.key = SDL_SCANCODE_LSHIFT;
+        keyboardData.down = true;
+        GNW95_process_key(&keyboardData);
+    }
+
+    keyboardData.key = scancode;
+    keyboardData.down = true;
+    GNW95_process_key(&keyboardData);
+    keyboardData.down = false;
+    GNW95_process_key(&keyboardData);
+
+    if (uppercase) {
+        keyboardData.key = SDL_SCANCODE_LSHIFT;
+        keyboardData.down = false;
+        GNW95_process_key(&keyboardData);
     }
 }
 

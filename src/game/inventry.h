@@ -91,6 +91,11 @@ int drop_ammo_into_weapon(Object* weapon, Object* ammo, Object** a3, int quantit
 void draw_amount(int value, int inventoryWindowType);
 int inven_set_timer(Object* a1);
 
+int agent_equip_item(int index, int hand);
+int agent_unequip_item(int slot);
+int agent_loot_item(int index, bool take, int quantity);
+int agent_barter_item(int index, int action, int quantity);
+
 } // namespace fallout
 
 #endif /* FALLOUT_GAME_INVENTRY_H_ */

@@ -20,6 +20,7 @@
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 #include "plib/gnw/touch.h"
+#include "agent/agent_ipc.h"
 
 namespace fallout {
 
@@ -190,7 +191,7 @@ int gmovie_play(int game_movie, int game_movie_flags)
     int v11 = 0;
     int buttons;
     do {
-        if (!moviePlaying() || game_user_wants_to_quit || get_input() != -1) {
+        if (agent_ipc_connected() || !moviePlaying() || game_user_wants_to_quit || get_input() != -1) {
             break;
         }
 

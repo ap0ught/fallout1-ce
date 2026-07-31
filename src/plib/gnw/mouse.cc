@@ -9,6 +9,9 @@
 #include "plib/gnw/touch.h"
 #include "plib/gnw/vcr.h"
 
+#include "agent/agent_ipc.h"
+#include "agent/agent_commands.h"
+
 namespace fallout {
 
 static void mouse_colorize();
@@ -481,7 +484,8 @@ void mouse_info()
     int buttons = 0;
 
     MouseData mouseData;
-    if (dxinput_get_mouse_state(&mouseData)) {
+    if (agent_get_mouse_state(&mouseData) || dxinput_get_mouse_state(&mouseData))
+{
         x = mouseData.x;
         y = mouseData.y;
 
@@ -497,9 +501,11 @@ void mouse_info()
         y = 0;
     }
 
-    // Adjust for mouse senstivity.
-    x = (int)(x * mouse_sensitivity);
-    y = (int)(y * mouse_sensitivity);
+    if (!agent_ipc_connected()) {
+        // Adjust for mouse senstivity.
+        x = (int)(x * mouse_sensitivity);
+        y = (int)(y * mouse_sensitivity);
+    }
 
     if (vcr_state == VCR_STATE_PLAYING) {
         if (((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_PRESS) != 0 && buttons != 0)
@@ -675,6 +681,14 @@ void mouse_get_position(int* x, int* y)
 {
     *x = mouse_hotx + mouse_x;
     *y = mouse_hoty + mouse_y;
+}
+
+void mouse_get_agent_delta(MouseData* mouseData)
+{
+    int cx, cy;
+    mouse_get_position(&cx, &cy);
+    mouseData->x -= cx;
+    mouseData->y -= cy;
 }
 
 // 0x4B528C

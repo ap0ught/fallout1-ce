@@ -33,6 +33,9 @@
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 
+#include "agent/agent_commands.h"
+#include "agent/agent_ipc.h"
+
 namespace fallout {
 
 // The maximum number of subtitle lines per slide.
@@ -308,6 +311,12 @@ void endgame_movie()
         gmovie_play(MOVIE_WALKM, 0);
     } else {
         gmovie_play(MOVIE_WALKW, 0);
+    }
+
+    if (agent_ipc_connected()) {
+        agent_send_text("Congratulations! You beat Fallout. The ending cinematic shows "
+            "the Vault Dweller walking alone into the wasteland, exiled from Vault 13 "
+            "despite saving its people.");
     }
 
     credits("credits.txt", -1, false);
