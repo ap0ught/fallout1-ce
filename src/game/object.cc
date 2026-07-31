@@ -412,7 +412,7 @@ static int obj_read_obj(Object* obj, DB_FILE* stream)
     if (db_freadInt(stream, &(obj->lightIntensity)) == -1) return -1;
     if (db_freadInt(stream, &field_74) == -1) return -1;
     if (db_freadInt(stream, &(obj->sid)) == -1) return -1;
-    if (db_freadInt(stream, &(obj->field_80)) == -1) return -1;
+    if (db_freadInt(stream, &(obj->messageListIndex)) == -1) return -1;
 
     obj->outline = 0;
     obj->owner = NULL;
@@ -519,7 +519,7 @@ static int obj_load_func(DB_FILE* stream)
                     debug_printf("\nError connecting object to script!");
                 } else {
                     script->owner = objectListNode->obj;
-                    objectListNode->obj->field_80 = script->scr_script_idx;
+                    objectListNode->obj->messageListIndex = script->scr_script_idx;
                 }
             }
 
@@ -664,7 +664,7 @@ static int obj_write_obj(Object* obj, DB_FILE* stream)
     if (db_fwriteInt(stream, obj->lightIntensity) == -1) return -1;
     if (db_fwriteInt(stream, obj->outline) == -1) return -1;
     if (db_fwriteInt(stream, obj->sid) == -1) return -1;
-    if (db_fwriteInt(stream, obj->field_80) == -1) return -1;
+    if (db_fwriteInt(stream, obj->messageListIndex) == -1) return -1;
     if (proto_write_protoUpdateData(obj, stream) == -1) return -1;
 
     return 0;
@@ -1492,6 +1492,17 @@ int obj_reset_roof()
         tile_fill_roof(obj_last_roof_x, obj_last_roof_y, obj_dude->elevation, 1);
     }
     return 0;
+}
+
+bool obj_get_player_roof_info(int* outRoofX, int* outRoofY, int* outElev)
+{
+    if (obj_last_is_empty) {
+        return false;
+    }
+    if (outRoofX != nullptr) *outRoofX = obj_last_roof_x;
+    if (outRoofY != nullptr) *outRoofY = obj_last_roof_y;
+    if (outElev != nullptr) *outElev = obj_last_elev;
+    return true;
 }
 
 // Sets object fid.
@@ -2601,7 +2612,7 @@ void intensity_mask_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, 
 }
 
 // 0x47D9A4
-int obj_outline_object(Object* obj, int outlineType, Rect* rect)
+int obj_outline_object(Object* obj, int outlineType, Rect* rect, bool skipNoHighlight)
 {
     if (obj == NULL) {
         return -1;
@@ -2611,7 +2622,7 @@ int obj_outline_object(Object* obj, int outlineType, Rect* rect)
         return -1;
     }
 
-    if ((obj->flags & OBJECT_NO_HIGHLIGHT) != 0) {
+    if ((obj->flags & OBJECT_NO_HIGHLIGHT) != 0 && !skipNoHighlight) {
         return -1;
     }
 
@@ -3477,7 +3488,7 @@ static int obj_create_object(Object** objectPtr)
     object->pid = -1;
     object->sid = -1;
     object->owner = NULL;
-    object->field_80 = -1;
+    object->messageListIndex = -1;
 
     return 0;
 }

@@ -41,6 +41,7 @@ int obj_offset(Object* obj, int x, int y, Rect* rect);
 int obj_move(Object* a1, int a2, int a3, int elevation, Rect* a5);
 int obj_move_to_tile(Object* obj, int tile, int elevation, Rect* rect);
 int obj_reset_roof();
+bool obj_get_player_roof_info(int* outRoofX, int* outRoofY, int* outElev);
 int obj_change_fid(Object* obj, int fid, Rect* rect);
 int obj_set_frame(Object* obj, int frame, Rect* rect);
 int obj_inc_frame(Object* obj, Rect* rect);
@@ -79,7 +80,7 @@ void translucent_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeigh
 void dark_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int srcPitch, unsigned char* dest, int destX, int destY, int destPitch, int light);
 void dark_translucent_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int srcPitch, unsigned char* dest, int destX, int destY, int destPitch, int light, unsigned char* a10, unsigned char* a11);
 void intensity_mask_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int srcPitch, unsigned char* dest, int destPitch, unsigned char* mask, int maskPitch, int light);
-int obj_outline_object(Object* obj, int a2, Rect* rect);
+int obj_outline_object(Object* obj, int a2, Rect* rect, bool skipNoHighlight = false);
 int obj_remove_outline(Object* obj, Rect* rect);
 int obj_intersects_with(Object* object, int x, int y);
 int obj_create_intersect_list(int x, int y, int elevation, int objectType, ObjectWithFlags** entriesPtr);

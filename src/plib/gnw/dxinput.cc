@@ -1,5 +1,7 @@
 #include "plib/gnw/dxinput.h"
 
+#include "plib/gnw/svga.h"
+
 namespace fallout {
 
 static bool dxinput_mouse_init();
@@ -9,6 +11,11 @@ static void dxinput_keyboard_exit();
 
 static int gMouseWheelDeltaX = 0;
 static int gMouseWheelDeltaY = 0;
+
+// Track previous mouse position for calculating deltas in non-relative mode
+static int gMousePrevX = 0;
+static int gMousePrevY = 0;
+static bool gMousePrevInitialized = false;
 
 // 0x4E0400
 bool dxinput_init()
@@ -58,12 +65,41 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // CE: This function is sometimes called outside loops calling `get_input`
     // and subsequently `GNW95_process_message`, so mouse events might not be
     // handled by SDL yet.
-    //
-    // TODO: Move mouse events processing into `GNW95_process_message` and
-    // update mouse position manually.
     SDL_PumpEvents();
 
-    Uint32 buttons = SDL_GetRelativeMouseState(&(mouseState->x), &(mouseState->y));
+    // Get absolute window mouse position
+    int windowX, windowY;
+    Uint32 buttons = SDL_GetMouseState(&windowX, &windowY);
+
+    // Convert window coordinates to game (logical) coordinates
+    // This handles scaling automatically via SDL's renderer
+    float logicalX, logicalY;
+    if (gSdlRenderer != NULL) {
+        SDL_RenderWindowToLogical(gSdlRenderer, windowX, windowY, &logicalX, &logicalY);
+    } else {
+        logicalX = (float)windowX;
+        logicalY = (float)windowY;
+    }
+
+    int gameX = (int)logicalX;
+    int gameY = (int)logicalY;
+
+    // Store absolute position in game coordinates
+    mouseState->absX = gameX;
+    mouseState->absY = gameY;
+
+    // Calculate deltas in game coordinates for VCR compatibility
+    if (!gMousePrevInitialized) {
+        gMousePrevX = gameX;
+        gMousePrevY = gameY;
+        gMousePrevInitialized = true;
+    }
+
+    mouseState->x = gameX - gMousePrevX;
+    mouseState->y = gameY - gMousePrevY;
+    gMousePrevX = gameX;
+    gMousePrevY = gameY;
+
     mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
@@ -103,7 +139,11 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-    return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
+    // Disable relative mouse mode to keep the native cursor visible
+    // Deltas are calculated manually in dxinput_get_mouse_state()
+    SDL_SetRelativeMouseMode(SDL_FALSE);
+    gMousePrevInitialized = false;
+    return true;
 }
 
 // 0x4E078C

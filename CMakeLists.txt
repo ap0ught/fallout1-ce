@@ -38,6 +38,14 @@ if(UBSAN)
     target_link_options(${EXECUTABLE_NAME} PUBLIC "-fsanitize=undefined")
 endif()
 
+# Debug symbols for release builds to enable debugging crashes
+if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -g -fno-omit-frame-pointer)
+    if(APPLE)
+        set_target_properties(${EXECUTABLE_NAME} PROPERTIES XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym")
+    endif()
+endif()
+
 target_include_directories(${EXECUTABLE_NAME} PUBLIC src)
 
 target_sources(${EXECUTABLE_NAME} PUBLIC
@@ -171,6 +179,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/game/tile.h"
     "src/game/trait.cc"
     "src/game/trait.h"
+    "src/game/tweaks.cc"
+    "src/game/tweaks.h"
     "src/game/version.cc"
     "src/game/version.h"
     "src/game/wordwrap.cc"
@@ -183,6 +193,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/int/audio.h"
     "src/int/audiof.cc"
     "src/int/audiof.h"
+    "src/int/audiomp3.cc"
+    "src/int/audiomp3.h"
     "src/int/datafile.cc"
     "src/int/datafile.h"
     "src/int/dialog.cc"
@@ -338,6 +350,14 @@ if(APPLE)
         set(MACOSX_BUNDLE_ICON_FILE "fallout-ce.icns")
         set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout: Community Edition")
         set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
+
+        # Copy build to /Applications/Fallout/
+        add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "$<TARGET_BUNDLE_DIR:${EXECUTABLE_NAME}>"
+                    "/Applications/Fallout/Fallout Community Edition.app"
+            COMMENT "Copying build to /Applications/Fallout/"
+        )
     endif()
 
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.alexbatalov.fallout-ce")
