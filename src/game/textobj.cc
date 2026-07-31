@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "game/gconfig.h"
+#include "game/gdialog.h"
 #include "game/object.h"
 #include "game/tile.h"
 #include "game/wordwrap.h"
@@ -332,6 +333,10 @@ void text_object_render(Rect* rect)
 
     for (index = 0; index < text_object_index; index++) {
         textObject = text_object_list[index];
+        if ((textObject->flags & TEXT_OBJECT_MARKED_FOR_REMOVAL) != 0) {
+            continue;
+        }
+
         tile_coord(textObject->tile, &(textObject->x), &(textObject->y), map_elevation);
         textObject->x += textObject->sx;
         textObject->y += textObject->sy;
@@ -401,6 +406,7 @@ static void text_object_bk()
 
     if (textObjectsRemoved) {
         tile_refresh_rect(&dirtyRect, map_elevation);
+        gdialog_refresh_world();
     }
 }
 

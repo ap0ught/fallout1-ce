@@ -232,6 +232,10 @@ static int inven_pid = -1;
 // 0x505648
 static bool inven_is_initialized = false;
 
+// Active inventory window type while inventory/loot/trade UI is open.
+// -1 means no inventory window is currently active.
+static int inven_window_type = -1;
+
 // 0x50564C
 static int inven_display_msg_line = 1;
 
@@ -529,6 +533,7 @@ void handle_inventory()
 // 0x462818
 bool setup_inventory(int inventoryWindowType)
 {
+    inven_window_type = inventoryWindowType;
     dropped_explosive = 0;
     curr_stack = 0;
     stack_offset[0] = 0;
@@ -1314,6 +1319,8 @@ void exit_inventory(bool shouldEnableIso)
 
         dropped_explosive = false;
     }
+
+    inven_window_type = -1;
 }
 
 // 0x463758
@@ -1880,6 +1887,33 @@ void inven_exit()
     inventry_msg_unload();
 
     inven_is_initialized = 0;
+    inven_window_type = -1;
+}
+
+Object* inven_get_container_target()
+{
+    if (!inven_is_initialized) {
+        return NULL;
+    }
+
+    if (inven_window_type != INVENTORY_WINDOW_TYPE_LOOT) {
+        return NULL;
+    }
+
+    if (target_curr_stack < 0 || target_curr_stack >= 10) {
+        return NULL;
+    }
+
+    return target_stack[target_curr_stack];
+}
+
+int inven_get_window_type()
+{
+    if (!inven_is_initialized) {
+        return -1;
+    }
+
+    return inven_window_type;
 }
 
 // 0x4643EC
@@ -2405,7 +2439,7 @@ Object* inven_right_hand(Object* critter)
     Inventory* inventory;
     Object* item;
 
-    if (i_rhand != NULL && critter == inven_dude) {
+    if (inven_is_initialized && i_rhand != NULL && critter == inven_dude) {
         return i_rhand;
     }
 
@@ -2427,7 +2461,7 @@ Object* inven_left_hand(Object* critter)
     Inventory* inventory;
     Object* item;
 
-    if (i_lhand != NULL && critter == inven_dude) {
+    if (inven_is_initialized && i_lhand != NULL && critter == inven_dude) {
         return i_lhand;
     }
 
@@ -2449,7 +2483,7 @@ Object* inven_worn(Object* critter)
     Inventory* inventory;
     Object* item;
 
-    if (i_worn != NULL && critter == inven_dude) {
+    if (inven_is_initialized && i_worn != NULL && critter == inven_dude) {
         return i_worn;
     }
 

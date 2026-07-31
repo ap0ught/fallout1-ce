@@ -28,6 +28,10 @@
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 
+#ifdef AGENT_BRIDGE
+#include "agent_bridge.h"
+#endif
+
 namespace fallout {
 
 #define CS_WINDOW_WIDTH 640
@@ -203,6 +207,10 @@ int select_character()
         return 0;
     }
 
+#ifdef AGENT_BRIDGE
+    agentBridgeSetContext(AGENT_CONTEXT_CHAR_SELECTOR);
+#endif
+
     bool cursorWasHidden = mouse_hidden();
     if (cursorWasHidden) {
         mouse_show();
@@ -240,22 +248,34 @@ int select_character()
         case KEY_UPPERCASE_C:
         case KEY_LOWERCASE_C:
             ResetPlayer();
+#ifdef AGENT_BRIDGE
+            agentBridgeSetContext(AGENT_CONTEXT_CHAR_EDITOR);
+#endif
             if (editor_design(1) == 0) {
                 rc = 2;
                 done = true;
             } else {
                 select_update_display();
             }
+#ifdef AGENT_BRIDGE
+            agentBridgeSetContext(AGENT_CONTEXT_CHAR_SELECTOR);
+#endif
 
             break;
         case KEY_UPPERCASE_M:
         case KEY_LOWERCASE_M:
+#ifdef AGENT_BRIDGE
+            agentBridgeSetContext(AGENT_CONTEXT_CHAR_EDITOR);
+#endif
             if (!editor_design(1)) {
                 rc = 2;
                 done = true;
             } else {
                 select_update_display();
             }
+#ifdef AGENT_BRIDGE
+            agentBridgeSetContext(AGENT_CONTEXT_CHAR_SELECTOR);
+#endif
 
             break;
         case KEY_UPPERCASE_T:

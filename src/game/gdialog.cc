@@ -189,6 +189,8 @@ static void about_reset_string();
 static void about_process_string();
 static int about_lookup_word(const char* search);
 static int about_lookup_name(const char* search);
+static void gdialog_refresh_agent_snapshot();
+static void gdialog_clear_agent_snapshot();
 
 // 0x504FDC
 static int fidgetFID = 0;
@@ -519,6 +521,12 @@ static int talkOldFont;
 // 0x58DAC8
 static GameDialogBlock dialogBlock;
 
+// Agent bridge dialogue snapshot (read-only for per-tick serialization).
+static char gdialogAgentReplyText[900];
+static char gdialogAgentOptionText[DIALOG_OPTION_ENTRIES_CAPACITY][900];
+static int gdialogAgentOptionCount = 0;
+static unsigned int gdialogAgentStateVersion = 0;
+
 // 0x5951AC
 static CacheEntry* upper_hi_key;
 
@@ -568,6 +576,7 @@ static int fidgetFrameCounter;
 // 0x43DE08
 int gdialog_init()
 {
+    gdialog_clear_agent_snapshot();
     return 0;
 }
 
@@ -575,6 +584,7 @@ int gdialog_init()
 int gdialog_reset()
 {
     gdialog_free_speech();
+    gdialog_clear_agent_snapshot();
     return 0;
 }
 
@@ -582,6 +592,7 @@ int gdialog_reset()
 int gdialog_exit()
 {
     gdialog_free_speech();
+    gdialog_clear_agent_snapshot();
     return 0;
 }
 
@@ -589,6 +600,24 @@ int gdialog_exit()
 bool dialog_active()
 {
     return dialog_state_fix != 0;
+}
+
+void gdialog_refresh_world()
+{
+    if (gdialog_state != 1 || dialogue_state != 1) {
+        return;
+    }
+
+    if (dialogueBackWindow == -1 || headWindowBuffer == NULL) {
+        return;
+    }
+
+    // Only refresh the world snapshot path used by no-head dialogue.
+    if (fidgetFp != NULL) {
+        return;
+    }
+
+    talk_to_display_frame(NULL, 0);
 }
 
 // 0x43DE28
@@ -904,6 +933,7 @@ int scr_dialogue_exit()
     gmouse_3d_on();
 
     gdDialogWentOff = true;
+    gdialog_clear_agent_snapshot();
 
     return 0;
 }
@@ -988,11 +1018,46 @@ void gdialog_display_msg(char* msg)
     win_draw(gReplyWin);
 }
 
+// Bridge helpers used by external state serialization.
+const char* gdialog_get_reply_text()
+{
+    return gdialogAgentReplyText;
+}
+
+int gdialog_get_option_count()
+{
+    return gdialogAgentOptionCount;
+}
+
+const char* gdialog_get_option_text(int index)
+{
+    if (index < 0 || index >= gdialogAgentOptionCount) {
+        return "";
+    }
+
+    return gdialogAgentOptionText[index];
+}
+
+unsigned int gdialog_get_state_version()
+{
+    return gdialogAgentStateVersion;
+}
+
+void gdialog_highlight_option(int index)
+{
+    if (index < 0 || index >= gdNumOptions) {
+        return;
+    }
+
+    gDialogProcessHighlight(index);
+}
+
 // 0x43E5E4
 int gDialogStart()
 {
     curReviewSlot = 0;
     gdNumOptions = 0;
+    gdialog_clear_agent_snapshot();
     return 0;
 }
 
@@ -1091,6 +1156,7 @@ int gDialogReply(Program* program, int messageListId, int messageId)
     dialogBlock.offset = 0;
     dialogBlock.replyText[0] = '\0';
     gdNumOptions = 0;
+    gdialog_refresh_agent_snapshot();
 
     return 0;
 }
@@ -1108,6 +1174,7 @@ int gDialogReplyStr(Program* program, int messageListId, const char* text)
     strcpy(dialogBlock.replyText, text);
 
     gdNumOptions = 0;
+    gdialog_refresh_agent_snapshot();
 
     return 0;
 }
@@ -1252,6 +1319,7 @@ int gDialogSayMessage()
 
     gdNumOptions = 0;
     dialogBlock.replyMessageListId = -1;
+    gdialog_clear_agent_snapshot();
 
     return 0;
 }
@@ -1868,6 +1936,52 @@ static void gDialogProcessUpdate()
 
     win_draw(gReplyWin);
     win_draw(gOptionWin);
+    gdialog_refresh_agent_snapshot();
+}
+
+static void gdialog_bump_agent_state_version()
+{
+    gdialogAgentStateVersion++;
+    if (gdialogAgentStateVersion == 0) {
+        gdialogAgentStateVersion = 1;
+    }
+}
+
+static void gdialog_clear_agent_snapshot()
+{
+    gdialogAgentReplyText[0] = '\0';
+    gdialogAgentOptionCount = 0;
+
+    for (int index = 0; index < DIALOG_OPTION_ENTRIES_CAPACITY; index++) {
+        gdialogAgentOptionText[index][0] = '\0';
+    }
+
+    gdialog_bump_agent_state_version();
+}
+
+static void gdialog_refresh_agent_snapshot()
+{
+    strncpy(gdialogAgentReplyText, dialogBlock.replyText, sizeof(gdialogAgentReplyText) - 1);
+    gdialogAgentReplyText[sizeof(gdialogAgentReplyText) - 1] = '\0';
+
+    int optionCount = gdNumOptions;
+    if (optionCount < 0) {
+        optionCount = 0;
+    } else if (optionCount > DIALOG_OPTION_ENTRIES_CAPACITY) {
+        optionCount = DIALOG_OPTION_ENTRIES_CAPACITY;
+    }
+    gdialogAgentOptionCount = optionCount;
+
+    for (int index = 0; index < gdialogAgentOptionCount; index++) {
+        strncpy(gdialogAgentOptionText[index], dialogBlock.options[index].text, sizeof(gdialogAgentOptionText[index]) - 1);
+        gdialogAgentOptionText[index][sizeof(gdialogAgentOptionText[index]) - 1] = '\0';
+    }
+
+    for (int index = gdialogAgentOptionCount; index < DIALOG_OPTION_ENTRIES_CAPACITY; index++) {
+        gdialogAgentOptionText[index][0] = '\0';
+    }
+
+    gdialog_bump_agent_state_version();
 }
 
 // 0x43F8D4
